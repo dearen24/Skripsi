@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String    @id @default(uuid())
+  email            String
+  nik              String
+  nama             String
+  role             Role     @relation(fields: [idRole], references: [id])
+  idRole           String
+  dosenMengajar    ExamSubject[]
+  mengawas         ExamRoomLec[]
+}
+
+model ExamSubject {
+  id            String @id @default(uuid())
+  matkul        Subject    @relation(fields: [idMatkul], references: [id])
+  idMatkul      String
+  semester      Semester @relation(fields: [idSemester], references: [id])
+  idSemester    String
+  dosenPengajar User[]
+  peserta       Int
+}
+
+model Role {
+  id            String @id @default(uuid())
+  nama          String
+  kuotaMengawas Int
+  users         User[]
+}
+
+model Classroom {
+  id          String @id @default(uuid())
+  nama        String
+  kapasitas   Int
+  ujian       ExamRoomLec[]
+}
+
+model Semester {
+  id          String @id @default(uuid())
+  semester    String
+  status      Boolean
+  matkulujian ExamSubject[]
+  ujian       Exam[]
+  tukarjadwal HistoryTukar[]
+}
+
+model Subject {
+  id            String @id @default(uuid())
+  kode          String
+  nama          String
+  matkulujian   ExamSubject[]
+  ujian         Exam[]  
+}
+
+model Rules {
+  id          String @id @default(uuid())
+  sebelum12   Boolean
+  melewati12  Boolean
+  setelah12   Boolean
+  konsumsi    String
+}
+
+model Exam {
+  id          String @id @default(uuid())
+  date        DateTime @db.Date
+  mulai       DateTime @db.Time()
+  selesai     DateTime @db.Time()
+  tipe        String
+  shift       Int
+  metode      String
+  idSemester  String
+  semester    Semester @relation(fields: [idSemester], references: [id])
+  matkul      Subject[]
+  ujian       ExamRoomLec[]
+}
+
+model ExamRoomLec {
+  id          String @id @default(uuid())
+  ujian       Exam @relation(fields: [idUjian], references: [id])
+  idUjian     String
+  idRuangan   String?
+  idDosen     String?
+  dosen       User? @relation(fields: [idDosen], references: [id])
+  ruangan     Classroom? @relation(fields: [idRuangan], references: [id])
+  snack       Int
+  lunch       Int
+}
+
+model HistoryTukar {
+  idUjianRuanganDosen1    String
+  idUjianRuanganDosen2    String
+  statusDosen2            String
+  statusAdmin             String
+  idSemester              String
+  semester                Semester @relation(fields: [idSemester], references: [id])
+  @@id([idUjianRuanganDosen1,idUjianRuanganDosen2])
+}

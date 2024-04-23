@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "HistoryTukar" ALTER COLUMN "statusDosen2" SET DATA TYPE TEXT,
+ALTER COLUMN "statusAdmin" SET DATA TYPE TEXT;

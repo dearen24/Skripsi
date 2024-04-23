@@ -1,0 +1,7 @@
+{
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/admin/pertukarandosen/page": "app/admin/pertukarandosen/page.js",
+  "/admin/dosen/page": "app/admin/dosen/page.js",
+  "/dosen/pengajuansaya/page": "app/dosen/pengajuansaya/page.js"
+}
