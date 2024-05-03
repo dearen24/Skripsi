@@ -55,7 +55,7 @@ export default function AddClass(){
                                 </div>
                             </div>
                         </div>
-                        <AddButton page="Jabatan"/>
+                        <AddButton page="Ruangan"/>
                     </form>
                 </div>
             </div>

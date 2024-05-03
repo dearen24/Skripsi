@@ -1,7 +1,7 @@
 "use client"
 import { CloseButton, Toast, ToastContainer } from "react-bootstrap";
 
-export default function ToastSuccess({toastTambah,closeToastTambah,page}:any){
+export default function ToastSuccessDelete({toastTambah,closeToastTambah,page}:any){
     
     return(
         <ToastContainer position="top-end">

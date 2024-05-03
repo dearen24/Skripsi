@@ -1,11 +1,14 @@
 "use client"
 import { EditButton } from "../buttons/EditButton";
 import { DeleteButton } from "../buttons/DeleteButton";
+import { useEffect, useState } from "react";
+import { getMatkulujianByMatkulId } from "@/app/actions/matkulujian";
 
 const ItemUjian = (ujian) => {
     const date = String(ujian.ujian.date).split(" ");
     const mulai = String(ujian.ujian.mulai).split(" ")[4].substring(0,5);
     const selesai = String(ujian.ujian.selesai).split(" ")[4].substring(0,5);
+
     return(
         <tbody>
             <tr>

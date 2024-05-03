@@ -14,6 +14,10 @@ export default function MainMatkulUjian({props}){
     const [matkulujian, setMatkulujian] = useState(new Object);
     const [semester, setSemester] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
+    const [displayedMatkulUjian, setDisplayedMatkulUjian] = useState(new Object);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -25,6 +29,11 @@ export default function MainMatkulUjian({props}){
         try {
             const data = await getMatkulUjianBySemester(props.semester.id);
             const semester = await getSemester();
+
+            console.log(data);
+
+            setMaxPage(Math.ceil(data.length/10));
+            setDisplayedMatkulUjian(data.slice(0,10));
             setSemester(semester);
             setMatkulujian(data)
             setLoading(false);
@@ -39,6 +48,28 @@ export default function MainMatkulUjian({props}){
         setMatkulujian(data);
         router.refresh();
         openToastTambah();
+    }
+
+    const nextPage = () => {
+        var currentPage = page;
+        if(currentPage<maxPage){
+            currentPage++;
+            setPage(currentPage);
+            setDisplayedMatkulUjian(matkulujian.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const prevPage = () => {
+        var currentPage = page;
+        if(currentPage>1){
+            currentPage--;
+            setPage(currentPage);
+            setDisplayedMatkulUjian(matkulujian.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
     }
 
     const AddMatkulUjian = () => {
@@ -71,6 +102,7 @@ export default function MainMatkulUjian({props}){
                         </FormSelect>
                     </div>
                 </div>
+                <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
                         <thead className="table-dark">
@@ -82,11 +114,28 @@ export default function MainMatkulUjian({props}){
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
                             </tr>
                         </thead>
-                        {matkulujian.map((matkulu)=>(
+                        {search=="" ? 
+                        displayedMatkulUjian.map((matkulu)=>(
                             <ItemMatkulUjian key={matkulu.id} matkulujian={matkulu} allmatkulujian={matkulujian} setMatkulujian={changeData}/>
-                        ))}
+                        ))
+                        :
+                        matkulujian.map((matkulu)=>(
+                            matkulu.matkul.nama.toLowerCase().includes(search.toLowerCase()) ?
+                            <ItemMatkulUjian key={matkulu.id} matkulujian={matkulu} allmatkulujian={matkulujian} setMatkulujian={changeData}/>
+                            :
+                            null
+                        ))
+                        }
                     </table>
                 </div>
+                {search=="" && matkulujian.length > 10 ? 
+                <div>
+                    <button className="btn btn-primary" onClick={prevPage}>Prev</button>
+                    <button className="btn btn-primary" onClick={nextPage}>Next</button>
+                </div>
+                :
+                null
+                }
             </div>
 
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Mata Kuliah Ujian"}/>

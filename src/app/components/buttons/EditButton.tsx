@@ -33,6 +33,9 @@ export function EditButton(page){
         else if(page.page=="Aturan Konsumsi"){
             router.push("/admin/aturankonsumsi/"+page.idAturan);
         }
+        else if(page.page=="Konsumsi Non-Pengawas"){
+            router.push("/admin/konsumsi/"+page.idKonsumsi);
+        }
     }
 
     return(

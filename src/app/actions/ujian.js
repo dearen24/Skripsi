@@ -25,6 +25,11 @@ export async function getUjianBySemester(idSemester,tipe){
             idSemester:String(idSemester),
             tipe:tipe,
         },
+        orderBy:[
+            {
+                date:'asc',
+            }
+        ],
         include:{
             matkul:true,
             semester:true,
@@ -34,8 +39,7 @@ export async function getUjianBySemester(idSemester,tipe){
                     dosen:true,
                 }
             }
-        }
-        
+        },
     });
 
     return allUjian;

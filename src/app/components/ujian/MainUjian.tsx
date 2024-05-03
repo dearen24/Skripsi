@@ -15,7 +15,7 @@ export default function MainUjian({props}){
     const [ujian, setUjian] = useState(new Object);
     const [semester, setSemester] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
-    const [selectedData,setSelectedData] = useState({semester:props.semester.id,tipe:"UTS"});
+    const [selectedData,setSelectedData] = useState(new Object);
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -25,10 +25,32 @@ export default function MainUjian({props}){
     // Fetch data on component mount
     const fetchData = async () => {
         try {
-            const data = await getUjianBySemester(selectedData.semester,selectedData.tipe);
+            const data = await getUjianBySemester(props.semester.id,"UTS");
             const semester = await getSemester();
+            const ujianDate = [];
+            let index = 0;
+
+            for(let i = 0;i<data.length;i++){
+                if(i!=0){
+                    const dateBefore = String(data[i-1].date).split(" ")[1]+" "+String(data[i-1].date).split(" ")[2]+" "+String(data[i-1].date).split(" ")[3];
+                    const dateNow = String(data[i].date).split(" ")[1]+" "+String(data[i].date).split(" ")[2]+" "+String(data[i].date).split(" ")[3];
+                    
+                    if(dateBefore==dateNow){
+                        ujianDate[index].push(data[i]);
+                    }
+                    else{
+                        index++;
+                        ujianDate.push([data[i]]);
+                    }
+                }
+                else{
+                    ujianDate.push([data[i]]);
+                }
+            }
+
+            setSelectedData({date:ujianDate[0][0].date.toISOString(),tipe:"UTS",semester:props.semester.id});
             setSemester(semester);
-            setUjian(data)
+            setUjian(ujianDate)
             setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -50,17 +72,66 @@ export default function MainUjian({props}){
     const handleChangeSemester = async (e) => {
         const dataTemp = {...selectedData};
         dataTemp.semester = e.target.value;
-        const data = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const ujianDate = [];
+        let index = 0;
+
+        for(let i = 0;i<ujianTemp.length;i++){
+            if(i!=0){
+                const dateBefore = String(ujianTemp[i-1].date).split(" ")[1]+" "+String(ujianTemp[i-1].date).split(" ")[2]+" "+String(ujianTemp[i-1].date).split(" ")[3];
+                const dateNow = String(ujianTemp[i].date).split(" ")[1]+" "+String(ujianTemp[i].date).split(" ")[2]+" "+String(ujianTemp[i].date).split(" ")[3];
+                
+                if(dateBefore==dateNow){
+                    ujianDate[index].push(ujianTemp[i]);
+                }
+                else{
+                    index++;
+                    ujianDate.push([ujianTemp[i]]);
+                }
+            }
+            else{
+                ujianDate.push([ujianTemp[i]]);
+            }
+        }
+
         setSelectedData(dataTemp);
-        setUjian(data);
+        setUjian(ujianDate);
     }
 
     const handleChangeTipe = async (e) => {
         const dataTemp = {...selectedData};
         dataTemp.tipe = e.target.value;
-        const data = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const ujianDate = [];
+        let index = 0;
+
+        for(let i = 0;i<ujianTemp.length;i++){
+            if(i!=0){
+                const dateBefore = String(ujianTemp[i-1].date).split(" ")[1]+" "+String(ujianTemp[i-1].date).split(" ")[2]+" "+String(ujianTemp[i-1].date).split(" ")[3];
+                const dateNow = String(ujianTemp[i].date).split(" ")[1]+" "+String(ujianTemp[i].date).split(" ")[2]+" "+String(ujianTemp[i].date).split(" ")[3];
+                
+                if(dateBefore==dateNow){
+                    ujianDate[index].push(ujianTemp[i]);
+                }
+                else{
+                    index++;
+                    ujianDate.push([ujianTemp[i]]);
+                }
+            }
+            else{
+                ujianDate.push([ujianTemp[i]]);
+            }
+        }
+
+        console.log(ujianDate);
         setSelectedData(dataTemp);
-        setUjian(data);
+        setUjian(ujianDate);
+    }
+
+    const handleChangeDate = (e) => {
+        const tempData = {...selectedData};
+        tempData.date = e.target.value;
+        setSelectedData(tempData);
     }
 
     if(isLoading){
@@ -88,6 +159,16 @@ export default function MainUjian({props}){
                             <option value="UAS">UAS</option>
                         </FormSelect>
                     </div>
+                    <div className="">
+                        <FormSelect onChange={handleChangeDate}>
+                            {ujian.map((u)=>(
+                                u[0].date.toISOString()==selectedData.date ?
+                                <option value={u[0].date.toISOString()} selected>{u[0].date.toDateString().split(" ")[0]+", "+u[0].date.toDateString().split(" ")[2]+" "+u[0].date.toDateString().split(" ")[1]+" "+u[0].date.toDateString().split(" ")[3]}</option>
+                                :
+                                <option value={u[0].date.toISOString()}>{u[0].date.toDateString().split(" ")[0]+", "+u[0].date.toDateString().split(" ")[2]+" "+u[0].date.toDateString().split(" ")[1]+" "+u[0].date.toDateString().split(" ")[3]}</option>
+                            ))}
+                        </FormSelect>
+                    </div>
                 </div>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
@@ -104,8 +185,13 @@ export default function MainUjian({props}){
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
                             </tr>
                         </thead>
-                        {ujian.map((u)=>(
-                            <ItemUjian key={u.id} ujian={u} allUjian={ujian} setUjian={changeData}/>
+                        {ujian.map((uj)=>(
+                            selectedData.date==uj[0].date.toISOString() ?
+                            uj.map((u)=>(
+                                <ItemUjian key={u.id} ujian={u} allUjian={ujian} setUjian={changeData}/>
+                            ))
+                            :
+                            null
                         ))}
                     </table>
                 </div>

@@ -2,10 +2,13 @@
 import { Form } from "react-bootstrap";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { getMatkulujianByMatkulId } from "@/app/actions/matkulujian";
 
 const ItemPengawas = (props) => {
     const [itemSelect, setItemSelect] = useState(new Object);
     const [selectIndex,setSelectIndex] = useState(Number(0));
+    const [dosenPengajar, setDosenPengajar] = useState();
+    const [loading, setLoading] = useState(true);
 
     const date = String(props.ujian.date).split(" ");
     const mulai = String(props.ujian.mulai).split(" ")[4].substring(0,5);
@@ -21,8 +24,16 @@ const ItemPengawas = (props) => {
                     items[i+1] = {id:props.ruangandosen.dosen[i].id};
                 }
 
+                const arrDosenPengajar = [];
+                for(let i = 0;i<props.ujian.matkul.length;i++){
+                    const data = await getMatkulujianByMatkulId(props.ujian.matkul[i].id);
+                    arrDosenPengajar.push(data);
+                }
+
+                setDosenPengajar(arrDosenPengajar);
                 setItemSelect(items);
                 setSelectIndex(index);
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -61,6 +72,9 @@ const ItemPengawas = (props) => {
     if(props.hidden){
         return null;
     }
+    if(loading){
+        return null;
+    }
     else{
         return(
             <tbody>
@@ -69,12 +83,16 @@ const ItemPengawas = (props) => {
                     <td className="text-center">{mulai}</td>
                     <td className="text-center">{selesai}</td>                        
                     <td className="text-center">{props.ujian.metode}</td>
-                    <td className="text-center">{props.ujian.tipe}</td>
                     <td className="text-center">{props.ujian.shift}</td>
                     <td className="text-center">{props.ruangandosen.nama}</td>
                     <td className="text-center">
                         {props.ujian.matkul.map((matkul)=>(
                             <div><a>{matkul.nama}</a></div>    
+                        ))}
+                    </td>
+                    <td className="text-center">
+                        {dosenPengajar.map((dosen)=>(
+                            <div><a>{dosen.dosenPengajar[0].nama}</a></div>    
                         ))}
                     </td>
                     <td className="text-center">

@@ -14,6 +14,10 @@ export default function MainPengguna(){
     const [isLoading,setLoading] = useState(true);
     const [pengguna, setPengguna] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [displayedPengguna, setDisplayedPengguna] = useState(new Object);
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -24,6 +28,9 @@ export default function MainPengguna(){
     const fetchData = async () => {
         try {
             const data = await getUser();
+
+            setMaxPage(Math.ceil(data.length/10));
+            setDisplayedPengguna(data.slice(0,10));
             setPengguna(data)
             setLoading(false);
         } catch (error) {
@@ -39,6 +46,28 @@ export default function MainPengguna(){
         openToastTambah();
     }
 
+    const nextPage = () => {
+        var currentPage = page;
+        if(currentPage<maxPage){
+            currentPage++;
+            setPage(currentPage);
+            setDisplayedPengguna(pengguna.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const prevPage = () => {
+        var currentPage = page;
+        if(currentPage>1){
+            currentPage--;
+            setPage(currentPage);
+            setDisplayedPengguna(pengguna.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
+    }
+
     const addPengguna = () => {
         router.push("/admin/dosen/add");
     }
@@ -52,6 +81,7 @@ export default function MainPengguna(){
             <div className="table-responsive w-100">
                 <h1>Pengguna</h1>
                 <button className="btn btn-dark my-1" onClick={addPengguna}>Tambah Pengguna</button>
+                <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
                         <thead className="table-dark">
@@ -64,11 +94,28 @@ export default function MainPengguna(){
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
                             </tr>
                         </thead>
-                        {pengguna.map((user)=>(
+                        {search=="" ?
+                        displayedPengguna.map((user)=>(
                             <ItemDosen key={user.id} dosen={user} pengguna={pengguna} setPengguna={changeData}/>
-                        ))}
+                        ))
+                        :
+                        pengguna.map((user)=>(
+                            user.nama.toLowerCase().includes(search.toLowerCase()) ?
+                            <ItemDosen key={user.id} dosen={user} pengguna={pengguna} setPengguna={changeData}/>
+                            :
+                            null
+                        ))
+                        }
                     </table>
                 </div>
+                {search=="" && pengguna.length > 10 ? 
+                <div>
+                    <button className="btn btn-primary" onClick={prevPage}>Prev</button>
+                    <button className="btn btn-primary" onClick={nextPage}>Next</button>
+                </div>
+                :
+                null
+                }
             </div>
 
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Pengguna"}/>

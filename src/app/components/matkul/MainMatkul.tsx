@@ -10,6 +10,10 @@ export default function MainMatkul(){
     const [isLoading,setLoading] = useState(true);
     const [matkul, setMatkul] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
+    const [displayedMatkul, setDisplayedMatkul] = useState(new Object);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -20,6 +24,9 @@ export default function MainMatkul(){
     const fetchData = async () => {
         try {
             const data = await getMatkul();
+
+            setMaxPage(Math.ceil(data.length/10));
+            setDisplayedMatkul(data.slice(0,10));
             setMatkul(data)
             setLoading(false);
         } catch (error) {
@@ -35,6 +42,28 @@ export default function MainMatkul(){
         openToastTambah();
     }
 
+    const nextPage = () => {
+        var currentPage = page;
+        if(currentPage<maxPage){
+            currentPage++;
+            setPage(currentPage);
+            setDisplayedMatkul(matkul.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const prevPage = () => {
+        var currentPage = page;
+        if(currentPage>1){
+            currentPage--;
+            setPage(currentPage);
+            setDisplayedMatkul(matkul.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
+    }
+
     const addMatkul = () => {
         router.push("/admin/matkul/add");
     }
@@ -48,6 +77,7 @@ export default function MainMatkul(){
             <div className="table-responsive w-100">
                 <h1>Mata Kuliah</h1>
                 <button className="btn btn-dark my-1" onClick={addMatkul}>Tambah Mata Kuliah</button>
+                <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
                         <thead className="table-dark">
@@ -57,11 +87,28 @@ export default function MainMatkul(){
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
                             </tr>
                         </thead>
-                        {matkul.map((matakuliah)=>(
+                        {search=="" ?
+                        displayedMatkul.map((matakuliah)=>(
                             <ItemSemester key={matakuliah.id} matakuliah={matakuliah} matkul={matkul} setMatkul={changeData}/>
-                        ))}
+                        ))
+                        :
+                        matkul.map((matakuliah)=>(
+                            matakuliah.nama.toLowerCase().includes(search.toLowerCase()) ?
+                            <ItemSemester key={matakuliah.id} matakuliah={matakuliah} matkul={matkul} setMatkul={changeData}/>
+                            :
+                            null
+                        ))
+                        }
                     </table>
                 </div>
+                {search=="" && matkul.length > 10 ? 
+                <div>
+                    <button className="btn btn-primary" onClick={prevPage}>Prev</button>
+                    <button className="btn btn-primary" onClick={nextPage}>Next</button>
+                </div>
+                :
+                null
+                }
             </div>
 
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Mata Kuliah"}/>

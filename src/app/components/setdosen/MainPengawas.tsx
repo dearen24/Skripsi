@@ -8,6 +8,7 @@ import { getUser } from "@/app/actions/user";
 import Image from "next/image";
 import { getSemester } from "@/app/actions/semester";
 import ItemPengawas from "./ItemPengawas";
+import ToastSuccessEdit from "../toast/SuccessEdit";
 
 export default function MainPengawas({props}){
     const [isLoading,setLoading] = useState(true);
@@ -16,6 +17,10 @@ export default function MainPengawas({props}){
     const [semester, setSemester] = useState(new Object);
     const [selectedData,setSelectedData] = useState({semester:props.semester.id,tipe:"UTS"});
     const [hiddenAndDisabled, setHiddenAndDisabled] = useState(true);
+    const [toast, setToast] = useState(false);
+
+    const openToast = () => setToast(true);
+    const closeToast = () => setToast(false);
 
     useEffect(() => {
     // Fetch data on component mount
@@ -105,6 +110,8 @@ export default function MainPengawas({props}){
 
     const edit = async () => {
         await addPengawasUjian(ujian);
+        openToast();
+        setHiddenAndDisabled(true);
     }
 
     const onClickEdit = () => {
@@ -240,10 +247,10 @@ export default function MainPengawas({props}){
                                 <th className="text-center">Waktu Mulai</th>
                                 <th className="text-center">Waktu Selesai</th>
                                 <th className="text-center">Tipe Ujian</th>
-                                <th className="text-center">Metode Ujian</th>
                                 <th className="text-center">Shift</th>
                                 <th className="text-center">Ruangan</th>
                                 <th className="text-center">Mata Kuliah</th>
+                                <th className="text-center">Dosen Pengajar</th>
                                 <th className="text-center">Pengawas</th>
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Tambah Pengawas</th>
                             </tr>
@@ -268,6 +275,8 @@ export default function MainPengawas({props}){
                     Simpan Perubahan
                 </button> 
             </div>
+
+            <ToastSuccessEdit toast={toast} closeToast={closeToast} />
         </>
     )
 }

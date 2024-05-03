@@ -43,6 +43,19 @@ export async function getMatkulujianById(id){
     return matkulujian;
 }
 
+export async function getMatkulujianByMatkulId(id){
+    const matkulujian = await db.examSubject.findFirst({
+        where:{
+            idMatkul:String(id)
+        },
+        include:{
+            dosenPengajar: true,
+        }
+    });
+
+    return matkulujian;
+}
+
 export async function deleteMatkulujian(idUser){
     try{
         const matkulujian = await db.examSubject.delete({

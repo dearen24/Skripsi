@@ -10,6 +10,10 @@ export default function MainSemester(){
     const [isLoading,setLoading] = useState(true);
     const [semester, setSemester] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
+    const [displayedSemester, setDisplayedSemester] = useState(new Object);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -20,6 +24,9 @@ export default function MainSemester(){
     const fetchData = async () => {
         try {
             const data = await getSemester();
+
+            setMaxPage(Math.ceil(data.length/10));
+            setDisplayedSemester(data.slice(0,10));
             setSemester(data)
             setLoading(false);
         } catch (error) {
@@ -35,6 +42,28 @@ export default function MainSemester(){
         openToastTambah();
     }
 
+    const nextPage = () => {
+        var currentPage = page;
+        if(currentPage<maxPage){
+            currentPage++;
+            setPage(currentPage);
+            setDisplayedSemester(semester.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const prevPage = () => {
+        var currentPage = page;
+        if(currentPage>1){
+            currentPage--;
+            setPage(currentPage);
+            setDisplayedSemester(semester.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
+    }
+
     const addSemester = () => {
         router.push("/admin/semester/add");
     }
@@ -48,6 +77,7 @@ export default function MainSemester(){
             <div className="table-responsive w-100">
                 <h1>Pengguna</h1>
                 <button className="btn btn-dark my-1" onClick={addSemester}>Tambah Semester</button>
+                <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
                         <thead className="table-dark">
@@ -57,11 +87,28 @@ export default function MainSemester(){
                                 <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
                             </tr>
                         </thead>
-                        {semester.map((sem)=>(
+                        {search=="" ?
+                        displayedSemester.map((sem)=>(
                             <ItemSemester key={sem.id} sem={sem} semester={semester} setSemester={changeData}/>
-                        ))}
+                        ))
+                        :
+                        semester.map((sem)=>(
+                            sem.semester.toLowerCase().includes(search.toLowerCase()) ?
+                            <ItemSemester key={sem.id} sem={sem} semester={semester} setSemester={changeData}/>
+                            :
+                            null
+                        ))
+                        }
                     </table>
                 </div>
+                {search=="" && semester.length > 10 ? 
+                <div>
+                    <button className="btn btn-primary" onClick={prevPage}>Prev</button>
+                    <button className="btn btn-primary" onClick={nextPage}>Next</button>
+                </div>
+                :
+                null
+                }
             </div>
 
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Semester"}/>

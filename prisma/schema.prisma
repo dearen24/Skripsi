@@ -46,12 +46,13 @@ model Classroom {
 }
 
 model Semester {
-  id          String @id @default(uuid())
-  semester    String
-  status      Boolean
-  matkulujian ExamSubject[]
-  ujian       Exam[]
-  tukarjadwal HistoryTukar[]
+  id                  String @id @default(uuid())
+  semester            String
+  status              Boolean
+  matkulujian         ExamSubject[]
+  ujian               Exam[]
+  tukarjadwal         HistoryTukar[]
+  konsumsinonpengawas KonsumsiNonPengawas[]
 }
 
 model Subject {
@@ -104,4 +105,15 @@ model HistoryTukar {
   idSemester              String
   semester                Semester @relation(fields: [idSemester], references: [id])
   @@id([idUjianRuanganDosen1,idUjianRuanganDosen2])
+}
+
+model KonsumsiNonPengawas {
+  id          String    @id @default(uuid())
+  idSemester  String
+  semester    Semester @relation(fields: [idSemester], references: [id])
+  date        DateTime  @db.Date
+  tipe        String
+  snack       Int
+  lunch       Int
+  description String
 }

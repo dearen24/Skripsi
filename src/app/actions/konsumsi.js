@@ -181,3 +181,121 @@ export async function addKonsumsiDosen(idUjianRuanganDosen,konsumsi){
         return false;
     }
 }
+
+export async function addKonsumsiNonPengawas(formData){
+    const semester = formData.get("semester").toString();
+    const date = new Date(formData.get('tanggal').toString()).toISOString();
+    const masaujian = formData.get("masaujian").toString();
+    const snack = formData.get("snack").toString();
+    const lunch = formData.get("lunch").toString();
+    const catatan = formData.get("catatan").toString();
+    try{
+        await db.konsumsiNonPengawas.create({
+            data:{
+                idSemester:semester,
+                date:date,
+                tipe:masaujian,
+                snack:Number(snack),
+                lunch:Number(lunch),
+                description:catatan
+            }
+        });
+        return true;
+    }
+    catch(err){
+        console.error("Gagal menambahkan Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}
+
+export async function editKonsumsiNonPengawas(formData,id){
+    const semester = formData.get("semester").toString();
+    const date = new Date(formData.get('tanggal').toString()).toISOString();
+    const masaujian = formData.get("masaujian").toString();
+    const snack = formData.get("snack").toString();
+    const lunch = formData.get("lunch").toString();
+    const catatan = formData.get("catatan").toString();
+    try{
+        await db.konsumsiNonPengawas.update({
+            where:{
+                id:String(id),
+            },
+            data:{
+                idSemester:semester,
+                date:date,
+                tipe:masaujian,
+                snack:Number(snack),
+                lunch:Number(lunch),
+                description:catatan
+            }
+        });
+        return true;
+    }
+    catch(err){
+        console.error("Gagal menambahkan Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}
+
+export async function getKonsumsiNonPengawas(semester,masaujian){
+    try{
+        const konsumsi = await db.konsumsiNonPengawas.findMany({
+            where:{
+                idSemester:String(semester),
+                tipe:String(masaujian),
+            }
+        });
+        return konsumsi;
+    }
+    catch(err){
+        console.error("Gagal mengambil Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}
+
+export async function getKonsumsiNonPengawasByDate(date,masaujian,semester){
+    try{
+        const konsumsi = await db.konsumsiNonPengawas.findFirst({
+            where:{
+                idSemester:String(semester),
+                tipe:String(masaujian),
+                date:date,
+            }
+        });
+        return konsumsi;
+    }
+    catch(err){
+        console.error("Gagal mengambil Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}
+
+export async function getKonsumsiNonPengawasById(id){
+    try{
+        const konsumsi = await db.konsumsiNonPengawas.findFirst({
+            where:{
+                id:String(id),
+            }
+        });
+        return konsumsi;
+    }
+    catch(err){
+        console.error("Gagal mengamil Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}
+
+export async function deleteKonsumsiNonPengawas(id){
+    try{
+        await db.konsumsiNonPengawas.delete({
+            where:{
+                id:String(id),
+            }
+        });
+        return true;
+    }
+    catch(err){
+        console.error("Gagal menghapus Konsumsi Non Pengawas: ",err);
+        return false;
+    }
+}

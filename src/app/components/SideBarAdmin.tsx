@@ -137,6 +137,16 @@ const SidebarAdmin = ({session}) => {
                     </div>
                 </Button>
             </li>
+            <li className="nav-item my-1">
+                <Button className="w-100 btn btn-dark">
+                    <div className="d-flex flex-row align-items-center">
+                        <Image className="text-light" src="/book-fill-white.svg" alt="Pengguna" height={20} width={20}/>
+                        <Link href="/admin/rekapmengawas" className="nav-link link-light w-100 text-start">
+                            Rekap Mengawas
+                        </Link>
+                    </div>
+                </Button>
+            </li>
             </ul>
             <div className="dropdown">
                     <strong>Halo, {session}</strong>

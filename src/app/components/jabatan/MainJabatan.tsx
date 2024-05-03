@@ -11,6 +11,10 @@ export default function MainJabatan(){
     const [isLoading,setLoading] = useState(true);
     const [jabatan, setJabatan] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
+    const [maxPage, setMaxPage] = useState(0);
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState("");
+    const [displayedJabatan, setDisplayedJabatan] = useState(new Object);
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -21,6 +25,9 @@ export default function MainJabatan(){
         const fetchData = async () => {
             try {
                 const data = await getJabatan();
+
+                setMaxPage(Math.ceil(data.length/10));
+                setDisplayedJabatan(data.slice(0,10));
                 setJabatan(data)
                 setLoading(false);
             } catch (error) {
@@ -34,6 +41,28 @@ export default function MainJabatan(){
         setJabatan(data);
         router.refresh();
         openToastTambah();
+    }
+
+    const nextPage = () => {
+        var currentPage = page;
+        if(currentPage<maxPage){
+            currentPage++;
+            setPage(currentPage);
+            setDisplayedJabatan(jabatan.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const prevPage = () => {
+        var currentPage = page;
+        if(currentPage>1){
+            currentPage--;
+            setPage(currentPage);
+            setDisplayedJabatan(jabatan.slice((currentPage-1)*10,((currentPage-1)*10)+10));
+        }
+    }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
     }
     
     const addJabatan = () => {
@@ -49,6 +78,7 @@ export default function MainJabatan(){
             <div className="table-responsive w-100">
                 <h1>Jabatan</h1>
                 <button className="btn btn-dark my-1" onClick={addJabatan}>Tambah Jabatan</button>
+                <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
                 <div className="table-wrapper">
                     <table className="table table-hover align-middle">
                         <thead className="table-dark">
@@ -58,11 +88,28 @@ export default function MainJabatan(){
                                 <th className="text-center">Action</th>
                             </tr>
                         </thead>
-                        {jabatan.map((role)=>(
+                        {search=="" ? 
+                        displayedJabatan.map((role)=>(
                             <ItemJabatan key={role.id} role={role} jabatan={jabatan} setJabatan={changeData} />
-                        ))}
+                        ))
+                        :
+                        jabatan.map((role)=>(
+                            role.nama.toLowerCase().includes(search.toLowerCase()) ?
+                            <ItemJabatan key={role.id} role={role} jabatan={jabatan} setJabatan={changeData} />
+                            :
+                            null
+                        ))
+                        }
                     </table>
                 </div>
+                {search=="" && jabatan.length > 10 ? 
+                <div>
+                    <button className="btn btn-primary" onClick={prevPage}>Prev</button>
+                    <button className="btn btn-primary" onClick={nextPage}>Next</button>
+                </div>
+                :
+                null
+                }
             </div> 
 
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Jabatan"}/>

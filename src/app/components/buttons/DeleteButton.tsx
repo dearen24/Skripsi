@@ -9,7 +9,7 @@ import { deleteRuangan } from "@/app/actions/ruangan";
 import { deleteMatkul } from "@/app/actions/matkul";
 import { deleteMatkulujian } from "@/app/actions/matkulujian";
 import { deleteUjian } from "@/app/actions/ujian";
-import { deleteAturanKonsumsi } from "@/app/actions/konsumsi";
+import { deleteAturanKonsumsi, deleteKonsumsiNonPengawas } from "@/app/actions/konsumsi";
 import { deletePertukaran } from "@/app/actions/tukarjadwal";
 
 export function DeleteButton(props){
@@ -162,6 +162,22 @@ export function DeleteButton(props){
             }
             else{
                 alert("Gagal Menghapus Pertukaran Jadwal");
+            }
+        }
+        else if(props.page=="Konsumsi Non-Pengawas"){
+            const response = await deleteKonsumsiNonPengawas(props.idKonsumsi);
+            for(let i = 0;i<props.konsumsi.length;i++){
+                if(props.konsumsi[i]!=undefined){
+                    if(props.konsumsi[i].id==props.idKonsumsi){
+                        props.konsumsi.splice(i,1);
+                    }
+                }
+            }
+            if(response==true){
+                props.setKonsumsi(props.konsumsi);
+            }
+            else{
+                alert("Gagal Menghapus Konsumsi Non-Pengawas");
             }
         }
     }
