@@ -6,16 +6,17 @@ import { useRouter } from "next/navigation";
 import ToastSuccessAdd from "../toast/SuccessAdd";
 import ModalSuccessAdd from "../modal/SuccessAdd";
 import { getSemester } from "@/app/actions/semester";
-import { getMatkul } from "@/app/actions/matkul";
 import { addUjian } from "@/app/actions/ujian";
+import { getMatkulUjianBySemester } from "@/app/actions/matkulujian";
 
-export default function AddUjian(){
+export default function AddUjian({props}){
     const [isLoading,setLoading] = useState(true);
     const [semester,setSemester] = useState(new Object);
     const [matkul,setMatkul] = useState(new Object);
     const [selectedMatkul,setSelectedMatkul] = useState();
     const [modal,setModal] = useState(false);
     const [toast,setToast] = useState(false);
+    const [selectedSemester, setSelectedSemester] = useState(props.semester.id);
     const ref = useRef<HTMLFormElement>(null);
     const router = useRouter();
 
@@ -57,14 +58,14 @@ export default function AddUjian(){
         const fetchData = async () => {
             try {
                 const dataSemester = await getSemester();
-                const dataMatkul = await getMatkul();
-
+                const dataMatkul = await getMatkulUjianBySemester(props.semester.id);
+                
                 let arrMatkul = [];
 
                 for(let i = 0;i<dataMatkul.length;i++){
                     let data = new Object;
-                    data.value = dataMatkul[i].id;
-                    data.label = dataMatkul[i].nama;
+                    data.value = dataMatkul[i].matkul.id;
+                    data.label = dataMatkul[i].matkul.nama;
                     arrMatkul.push(data);
                 }
 
@@ -82,6 +83,21 @@ export default function AddUjian(){
         setSelectedMatkul(e.map(x => x.value));
     }
 
+    const handleChangeSemester = async (e) => {
+        const dataMatkul = await getMatkulUjianBySemester(e.target.value);
+                
+        let arrMatkul = [];
+
+        for(let i = 0;i<dataMatkul.length;i++){
+            let data = new Object;
+            data.value = dataMatkul[i].matkul.id;
+            data.label = dataMatkul[i].matkul.nama;
+            arrMatkul.push(data);
+        }
+
+        setMatkul(arrMatkul);
+    }
+
     if(isLoading){
         return <p>Loading...</p>
     }
@@ -97,9 +113,12 @@ export default function AddUjian(){
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Semester</label>
-                                <select className="form-control" name="semester">
+                                <select className="form-control" name="semester" onChange={handleChangeSemester}>
                                     {semester.map((sem)=>(
-                                        <option value={sem.id.toString()}>{sem.semester}</option>
+                                        sem.id==selectedSemester ?
+                                            <option value={sem.id.toString()} selected>{sem.semester}</option>
+                                        :
+                                            <option value={sem.id.toString()}>{sem.semester}</option>
                                         ))}
                                 </select>
                             </div>

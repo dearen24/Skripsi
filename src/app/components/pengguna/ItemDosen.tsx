@@ -15,7 +15,11 @@ const ItemDosen = (dosen) => {
                 <td className="text-center">
                     <div className="d-flex flex-row justify-content-center">
                         <EditButton page={"Dosen"} idDosen={dosen.dosen.id}/>
-                        <DeleteButton page={"Dosen"} idDosen={dosen.dosen.id} pengguna={dosen.pengguna} setPengguna={dosen.setPengguna}/>
+                        {dosen.dosen.role.nama=="Admin" ?
+                            null
+                        :
+                            <DeleteButton page={"Dosen"} idDosen={dosen.dosen.id} pengguna={dosen.pengguna} setPengguna={dosen.setPengguna}/>
+                        }
                     </div>
                 </td>
             </tr>

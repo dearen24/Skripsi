@@ -154,6 +154,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   addSemester: function() { return /* binding */ addSemester; },
 /* harmony export */   deleteSemester: function() { return /* binding */ deleteSemester; },
 /* harmony export */   editSemester: function() { return /* binding */ editSemester; },
+/* harmony export */   getActiveSemester: function() { return /* binding */ getActiveSemester; },
 /* harmony export */   getSemester: function() { return /* binding */ getSemester; },
 /* harmony export */   getSemesterById: function() { return /* binding */ getSemesterById; }
 /* harmony export */ });
@@ -167,10 +168,11 @@ function __build_action__(action, args) {
   return (0,next_dist_client_app_call_server__WEBPACK_IMPORTED_MODULE_0__.callServer)(action.$$id, args)
 }
 
-/* __next_internal_action_entry_do_not_use__ {"4866dc993eb6e633369798d6d78f97c5c3b80835":"getSemesterById","633dec1023a50b99cbdb023013a8abcdc4237509":"getSemester","a240e38b8f393d8bd963b9690599196af18d9c98":"editSemester","bcbdd900b29292a529f730e46e25d0949685f00d":"deleteSemester","ee32ab9266a780a448d89e408c42df7f2816ac71":"addSemester"} */ var deleteSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("bcbdd900b29292a529f730e46e25d0949685f00d");
+/* __next_internal_action_entry_do_not_use__ {"4866dc993eb6e633369798d6d78f97c5c3b80835":"getSemesterById","633dec1023a50b99cbdb023013a8abcdc4237509":"getSemester","9cfa0d224c9388f7e02fe51b5e18b5d5c49ec7cb":"getActiveSemester","a240e38b8f393d8bd963b9690599196af18d9c98":"editSemester","bcbdd900b29292a529f730e46e25d0949685f00d":"deleteSemester","ee32ab9266a780a448d89e408c42df7f2816ac71":"addSemester"} */ var deleteSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("bcbdd900b29292a529f730e46e25d0949685f00d");
 
 var getSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("633dec1023a50b99cbdb023013a8abcdc4237509");
 var getSemesterById = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("4866dc993eb6e633369798d6d78f97c5c3b80835");
+var getActiveSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("9cfa0d224c9388f7e02fe51b5e18b5d5c49ec7cb");
 var addSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("ee32ab9266a780a448d89e408c42df7f2816ac71");
 var editSemester = (0,private_next_rsc_action_client_wrapper__WEBPACK_IMPORTED_MODULE_1__.createServerReference)("a240e38b8f393d8bd963b9690599196af18d9c98");
 

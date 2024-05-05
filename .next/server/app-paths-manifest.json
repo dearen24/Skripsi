@@ -1,8 +1,9 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/admin/aturruangan/page": "app/admin/aturruangan/page.js",
-  "/admin/aturpengawas/page": "app/admin/aturpengawas/page.js",
-  "/admin/ujian/page": "app/admin/ujian/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/admin/jabatan/page": "app/admin/jabatan/page.js",
   "/admin/matkulujian/page": "app/admin/matkulujian/page.js",
-  "/admin/rekapmengawas/page": "app/admin/rekapmengawas/page.js"
+  "/admin/ujian/page": "app/admin/ujian/page.js",
+  "/admin/ujian/add/page": "app/admin/ujian/add/page.js",
+  "/admin/ujian/[id]/page": "app/admin/ujian/[id]/page.js"
 }

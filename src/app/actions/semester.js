@@ -16,6 +16,16 @@ export async function getSemesterById(id){
     return role;
 }
 
+export async function getActiveSemester(){
+    const semester = await db.semester.findFirst({
+        where:{
+            status:true,
+        }
+    });
+
+    return semester;
+}
+
 export async function addSemester(formData){
     "use server"
     const namaSemester = formData.get('semester').toString();

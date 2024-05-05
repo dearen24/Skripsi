@@ -15,8 +15,9 @@ export default function MainPengawas({props}){
     const [ujian, setUjian] = useState(new Object);
     const [dosen, setDosen] = useState(new Object);
     const [semester, setSemester] = useState(new Object);
-    const [selectedData,setSelectedData] = useState({semester:props.semester.id,tipe:"UTS"});
+    const [selectedData,setSelectedData] = useState(new Object);
     const [hiddenAndDisabled, setHiddenAndDisabled] = useState(true);
+    const [date, setDate] = useState(new Object);
     const [toast, setToast] = useState(false);
 
     const openToast = () => setToast(true);
@@ -26,7 +27,7 @@ export default function MainPengawas({props}){
     // Fetch data on component mount
     const fetchData = async () => {
         try {
-            const ujian = await getUjianBySemester(selectedData.semester,selectedData.tipe);
+            const ujian = await getUjianBySemester(props.semester.id,"UTS");
             // const ujian = await getUjian();
             const dosen = await getUser();
             const semester = await getSemester();
@@ -65,6 +66,24 @@ export default function MainPengawas({props}){
                 }
             }
 
+            const ujianDate = [];
+
+            for(let i = 0;i<ujian.length;i++){
+                if(i!=0){
+                    const dateBefore = String(ujian[i-1].date).split(" ")[1]+" "+String(ujian[i-1].date).split(" ")[2]+" "+String(ujian[i-1].date).split(" ")[3];
+                    const dateNow = String(ujian[i].date).split(" ")[1]+" "+String(ujian[i].date).split(" ")[2]+" "+String(ujian[i].date).split(" ")[3];
+                    
+                    if(dateBefore!=dateNow){
+                        ujianDate.push(ujian[i].date);    
+                    }
+                }
+                else{
+                    ujianDate.push(ujian[i].date);
+                }
+            }
+
+            setSelectedData({date:ujianDate[0].toISOString(),tipe:"UTS",semester:props.semester.id});
+            setDate(ujianDate);
             setSemester(semester);
             setUjian(ujian)
             setDosen(dosen);
@@ -164,6 +183,23 @@ export default function MainPengawas({props}){
             }
         }
 
+        const ujianDate = [];
+
+        for(let i = 0;i<ujianTemp.length;i++){
+            if(i!=0){
+                const dateBefore = String(ujianTemp[i-1].date).split(" ")[1]+" "+String(ujianTemp[i-1].date).split(" ")[2]+" "+String(ujianTemp[i-1].date).split(" ")[3];
+                const dateNow = String(ujianTemp[i].date).split(" ")[1]+" "+String(ujianTemp[i].date).split(" ")[2]+" "+String(ujianTemp[i].date).split(" ")[3];
+                
+                if(dateBefore!=dateNow){
+                    ujianDate.push(ujianTemp[i].date);    
+                }
+            }
+            else{
+                ujianDate.push(ujianTemp[i].date);
+            }
+        }
+
+        setDate(ujianDate);
         setDosen(dosenTemp);
         setUjian(ujianTemp);
     }
@@ -209,9 +245,34 @@ export default function MainPengawas({props}){
             }
         }
 
+        const ujianDate = [];
+
+        for(let i = 0;i<ujianTemp.length;i++){
+            if(i!=0){
+                const dateBefore = String(ujianTemp[i-1].date).split(" ")[1]+" "+String(ujianTemp[i-1].date).split(" ")[2]+" "+String(ujianTemp[i-1].date).split(" ")[3];
+                const dateNow = String(ujianTemp[i].date).split(" ")[1]+" "+String(ujianTemp[i].date).split(" ")[2]+" "+String(ujianTemp[i].date).split(" ")[3];
+                
+                if(dateBefore!=dateNow){
+                    ujianDate.push(ujianTemp[i].date);    
+                }
+            }
+            else{
+                ujianDate.push(ujianTemp[i].date);
+            }
+        }
+
+        setDate(ujianDate);
         setDosen(dosenTemp);
         setUjian(ujianTemp);
     }
+
+    const handleChangeDate = (e) => {
+        const tempData = {...selectedData};
+        tempData.date = e.target.value;
+        setSelectedData(tempData);
+    }
+
+    console.log(ujian);
 
     if(isLoading){
         return <LoadingPengguna/>
@@ -234,6 +295,16 @@ export default function MainPengawas({props}){
                             <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian">
                                 <option selected>UTS</option>
                                 <option>UAS</option>
+                            </Form.Select>
+                        </div>
+                        <div className="">
+                            <Form.Select onChange={handleChangeDate}>
+                                {date.map((d)=>(
+                                    d.toISOString()==selectedData.date ?
+                                    <option value={d.toISOString()} selected>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+                                    :
+                                    <option value={d.toISOString()}>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+                                ))}
                             </Form.Select>
                         </div>
                         <div>
@@ -264,9 +335,12 @@ export default function MainPengawas({props}){
                             ))
                         ))} */}
                         {ujian.map((u,indexUjian)=>(
+                            u.date.toISOString()==selectedData.date ?
                             u.ruangandosen.map((ruangandosen,indexRuanganDosen)=>(
                                 <ItemPengawas key={u.id+""+ruangandosen.id} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={false}/>
                             ))
+                            :
+                            null
                         ))}
                     </table>
                 </div> 

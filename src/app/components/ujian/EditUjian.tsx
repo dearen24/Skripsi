@@ -4,10 +4,10 @@ import Image from "next/image";
 import ToastSuccessEdit from "../toast/SuccessEdit";
 import { editUjian, getUjianById } from "@/app/actions/ujian";
 import { getSemester } from "@/app/actions/semester";
-import { getMatkul } from "@/app/actions/matkul";
 import Select from "react-select";
+import { getMatkulUjianBySemester } from "@/app/actions/matkulujian";
 
-export default function EditUjian({params}){
+export default function EditUjian({params,props}){
     const [isLoading,setLoading] = useState(true);
     const [ujian,setUjian] = useState();
     const [semester,setSemester] = useState();
@@ -50,17 +50,17 @@ export default function EditUjian({params}){
             try {
                 const dataUjian = await getUjianById(params);
                 const dataSemester = await getSemester();
-                const dataMatkul = await getMatkul();
+                const dataMatkul = await getMatkulUjianBySemester(props.semester.id);
 
                 let arrMatkul = [];
                 let arrSelectedMatkul = [];
 
                 for(let i = 0;i<dataMatkul.length;i++){
                     let data = new Object;
-                    data.value = dataMatkul[i].id;
-                    data.label = dataMatkul[i].kode+" - "+dataMatkul[i].nama;
+                    data.value = dataMatkul[i].matkul.id;
+                    data.label = dataMatkul[i].matkul.kode+" - "+dataMatkul[i].matkul.nama;
                     for(let j = 0;j<dataUjian?.matkul.length;j++){
-                        if(dataMatkul[i].id==dataUjian?.matkul[j].id){
+                        if(dataMatkul[i].matkul.id==dataUjian?.matkul[j].id){
                             arrSelectedMatkul.push(data);
                         }
                     }
@@ -83,6 +83,30 @@ export default function EditUjian({params}){
         setSelectedMatkul(e.map(x => x.value));
     }
 
+    const handleChangeSemester = async (e) => {
+        const dataMatkul = await getMatkulUjianBySemester(e.target.value);
+        const select = document.getElementById("selectmatkul");
+        
+        console.log(select);
+        let arrMatkul = [];
+        let arrSelectedMatkul = [];
+
+        for(let i = 0;i<dataMatkul.length;i++){
+            let data = new Object;
+            data.value = dataMatkul[i].matkul.id;
+            data.label = dataMatkul[i].matkul.kode+" - "+dataMatkul[i].matkul.nama;
+            for(let j = 0;j<ujian?.matkul.length;j++){
+                if(dataMatkul[i].matkul.id==ujian?.matkul[j].id){
+                    arrSelectedMatkul.push(data);
+                }
+            }
+            arrMatkul.push(data);
+        }
+
+        setMatkul(arrMatkul);
+        setSelectedMatkul(arrSelectedMatkul);
+    }
+
     if(isLoading){
         return <p>Loading...</p>
     }
@@ -98,7 +122,7 @@ export default function EditUjian({params}){
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Semester</label>
-                                <select className="form-control" name="semester">
+                                <select className="form-control" name="semester" onChange={handleChangeSemester}>
                                     {semester.map((sem)=>(
                                         sem.id == ujian.semester.id ? <option value={sem.id.toString()} selected>{sem.semester}</option> : <option value={sem.id.toString()}>{sem.semester}</option>
                                         ))}
@@ -144,7 +168,7 @@ export default function EditUjian({params}){
                             </div>
                             <div className="form-group w-50">
                                 <label>Mata Kuliah</label>
-                                <Select options={matkul} placeholder="Pilih Mata Kuliah" isMulti isSearchable isClearable name="matakuliah" onChange={handleChangeMatkul} defaultValue={selectedMatkul}/>
+                                    <Select options={matkul} id="selectmatkul" key={JSON.stringify(selectedMatkul)} placeholder="Pilih Mata Kuliah" isMulti isSearchable isClearable name="matakuliah" onChange={handleChangeMatkul} defaultValue={selectedMatkul}/>
                             </div>
                         </div>
                     </div>

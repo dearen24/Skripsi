@@ -12,11 +12,6 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/admin/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/layout.js"
-    ],
     "/admin/dosen/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -27,35 +22,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/dosen/loading.js"
     ],
-    "/admin/ruangan/page": [
+    "/admin/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/ruangan/page.js"
+      "static/chunks/app/admin/layout.js"
     ],
-    "/admin/jabatan/page": [
+    "/dosen/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/jabatan/page.js"
+      "static/chunks/app/dosen/layout.js"
     ],
-    "/admin/semester/page": [
+    "/dosen/jadwal/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/semester/page.js"
+      "static/chunks/app/dosen/jadwal/page.js"
     ],
-    "/admin/matkul/page": [
+    "/dosen/jadwal/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/matkul/page.js"
-    ],
-    "/admin/matkulujian/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/matkulujian/page.js"
-    ],
-    "/admin/matkulujian/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/admin/matkulujian/loading.js"
+      "static/chunks/app/dosen/jadwal/loading.js"
     ],
     "/admin/aturruangan/page": [
       "static/chunks/webpack.js",
@@ -66,6 +51,16 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/aturruangan/loading.js"
+    ],
+    "/admin/matkulujian/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/matkulujian/page.js"
+    ],
+    "/admin/matkulujian/loading": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/matkulujian/loading.js"
     ],
     "/admin/aturpengawas/page": [
       "static/chunks/webpack.js",
@@ -87,30 +82,45 @@
       "static/chunks/main-app.js",
       "static/chunks/app/admin/ujian/loading.js"
     ],
+    "/admin/aturruangan/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/aturruangan/[id]/page.js"
+    ],
     "/admin/rekapmengawas/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/rekapmengawas/page.js"
     ],
-    "/admin/pertukarandosen/page": [
+    "/admin/dosen/add/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/pertukarandosen/page.js"
+      "static/chunks/app/admin/dosen/add/page.js"
     ],
-    "/admin/konsumsi/page": [
+    "/admin/jabatan/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/konsumsi/page.js"
+      "static/chunks/app/admin/jabatan/page.js"
+    ],
+    "/admin/semester/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/semester/page.js"
+    ],
+    "/admin/semester/add/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/semester/add/page.js"
     ],
     "/admin/ujian/add/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/admin/ujian/add/page.js"
     ],
-    "/admin/konsumsi/add/page": [
+    "/admin/ujian/[id]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/admin/konsumsi/add/page.js"
+      "static/chunks/app/admin/ujian/[id]/page.js"
     ]
   }
 }
