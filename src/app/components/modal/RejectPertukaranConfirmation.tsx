@@ -10,10 +10,10 @@ export default function RejectPertukaranModal({modal,closeModal,onAction}:any){
             <Modal.Body>Jika sudah menolak pertukaran ini maka status sudah tidak dapat diubah lagi.</Modal.Body>
             <Modal.Body>Apakah Anda yakin ingin menolak pertukaran ini ?</Modal.Body>
             <Modal.Footer>
-                <button className="btn btn-danger" onClick={closeModal}>
+                <button className="btn btn-danger" onClick={closeModal} style={{border:"2px solid black"}}>
                     Tidak
                 </button>
-                <button className="btn btn-success" onClick={onAction}>
+                <button className="btn btn-success" onClick={onAction} style={{border:"2px solid black"}}>
                     Ya
                 </button>
             </Modal.Footer>

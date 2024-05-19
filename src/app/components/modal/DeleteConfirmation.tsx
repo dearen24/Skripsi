@@ -9,10 +9,10 @@ export default function DeleteConfirmationModal({modal,closeModal,deleteData,pag
             </Modal.Header>
             <Modal.Body>Apakah Anda yakin ingin menghapus {page}?</Modal.Body>
             <Modal.Footer>
-                <button className="btn btn-primary" onClick={closeModal}>
+                <button className="btn btn-primary" onClick={closeModal} style={{border:"2px solid black"}}>
                     Batal
                 </button>
-                <button className="btn btn-danger" onClick={deleteData}>
+                <button className="btn btn-danger" onClick={deleteData} style={{border:"2px solid black"}}>
                     Hapus
                 </button>
             </Modal.Footer>

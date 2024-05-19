@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
-import {getFood, getUjianRuanganDosen, getUjianRuanganDosenGroupByDate, getUjianSemesterGroupByDate} from "../../actions/ujian";
+import {getUjianRuanganDosen,  getUjianSemesterGroupByDate} from "../../actions/ujian";
 import LoadingPengguna from "../../admin/dosen/loading";
 import {addKonsumsiDosen, getAllExamDate, getAllExamDateDosen, getAturanKonsumsi} from "../../actions/konsumsi"
 import { FormSelect, Tab, Tabs } from "react-bootstrap";
@@ -14,8 +14,8 @@ export default function MainKonsumsi({props}){
     
     return(
         <>
-            <div className="table-responsive w-100">
-                <h1>Konsumsi</h1>
+            <div className="table-responsive w-100 mx-1">
+                <h3><strong>Konsumsi</strong></h3>
                 <div>
                     <Tabs
                         id="controlled-tab-example"

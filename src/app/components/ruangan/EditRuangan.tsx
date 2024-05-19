@@ -3,14 +3,22 @@ import { useEffect, useState } from "react";
 import { editRuangan, getRuanganById } from "../../actions/ruangan";
 import Image from "next/image";
 import ToastSuccessEdit from "../toast/SuccessEdit";
+import LoadingPage from "../LoadingPage";
+import { RuanganSchema } from "@/modules/schema";
+import ToastErrorInput from "../toast/ErrorInput";
 
 export default function EditClass({params}){
     const [isLoading,setLoading] = useState(true);
     const [ruangan,setRuangan] = useState();
     const [toast,setToast] = useState(false);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
 
     useEffect(() => {
         // Fetch data on component mount
@@ -27,25 +35,38 @@ export default function EditClass({params}){
         }, []);
 
     const edit = async (formData:FormData) => {
-        const response = await editRuangan(formData,params);
-        //const response = true;
-        if(response==true){
-            openToast();
+        const data = {
+            nama: formData.get("nama"),
+            kapasitas: Number(formData.get("kapasitas"))
+        }
+
+        const validation = RuanganSchema.safeParse(data);
+
+        if(validation.success){
+            const response = await editRuangan(formData,params);
+            if(response==true){
+                openToast();
+            }
+            else{
+                alert("Gagal Mengubah Jabatan");
+            }
         }
         else{
-            alert("Gagal Mengubah Jabatan");
+            setError(validation.error.issues);
+            openToastError();
         }
+        
     }
 
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Ubah Ruangan</h1>
+                    <h3><strong>Ubah Ruangan</strong></h3>
                 </div>
                 <div>
                     <form action={edit}>
@@ -53,17 +74,17 @@ export default function EditClass({params}){
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Nama Ruangan</label>
-                                    <input type="text" name="nama" className="form-control" defaultValue={ruangan?.nama}/>
+                                    <input type="text" name="nama" className="form-control" defaultValue={ruangan?.nama} style={{border:"2px solid black"}}/>
                                 </div>
                             </div>
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Kapasitas</label>
-                                    <input type="number" name="kapasitas" className="form-control" defaultValue={ruangan?.kapasitas}/>
+                                    <input type="number" name="kapasitas" className="form-control" defaultValue={ruangan?.kapasitas} style={{border:"2px solid black"}}/>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-warning w-100 my-2">
+                        <button type="submit" className="btn btn-warning w-100 my-2" style={{border:"2px solid black"}}>
                         <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
                         Simpan Perubahan
                     </button>
@@ -72,6 +93,7 @@ export default function EditClass({params}){
             </div>
 
             <ToastSuccessEdit toast={toast} closeToast={closeToast}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

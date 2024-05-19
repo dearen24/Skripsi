@@ -39,7 +39,7 @@ export function EditButton(page){
     }
 
     return(
-        <button className="btn btn-outline-primary mx-1" onClick={handleClick}>
+        <button className="btn btn-primary mx-1" onClick={handleClick} style={{border:"2px solid black"}}>
             <Image src="/pencil-fill.svg" alt="Edit" width={20} height={20}/>
         </button>
     )

@@ -12,6 +12,9 @@ import { getSemester } from "@/app/actions/semester";
 import { getMatkul } from "@/app/actions/matkul";
 import { Form } from "react-bootstrap";
 import React from "react";
+import LoadingPage from "../LoadingPage";
+import ToastErrorInput from "../toast/ErrorInput";
+import { MatkulUjianSchema } from "@/modules/schema";
 
 export default function AddMatkulUjian(){
     const [isLoading,setLoading] = useState(true);
@@ -20,7 +23,9 @@ export default function AddMatkulUjian(){
     const [dosen,setDosen] = useState(new Object);
     const [modal,setModal] = useState(false);
     const [toast,setToast] = useState(false);
-    const [selectedDosen, setSelectedDosen] = useState();
+    const [selectedDosen, setSelectedDosen] = useState([]);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
     const ref = useRef<HTMLFormElement>(null);
     const router = useRouter();
 
@@ -29,6 +34,8 @@ export default function AddMatkulUjian(){
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
 
     const backToHomepage = () => router.push("/admin/matkulujian");
 
@@ -70,22 +77,35 @@ export default function AddMatkulUjian(){
 
     async function add(formData:FormData){
         let arr = new Array;
-
         for(let i = 0;i<selectedDosen.length;i++){
             let data = new Object;
             data.id = selectedDosen[i];
             arr.push(data);
         }
-        
-        const response = await addMatkulujian(formData,arr);
-        // const response = true;
-        if(response==true){
-            ref.current?.reset();
-            openModal();
-            openToast();
+        const data = {
+            semester: formData.get("semester"),
+            jumlahPeserta: Number(formData.get("jumlahpeserta")),
+            matkul: formData.get("matkul"),
+            dosenPengajar: arr,
+        }
+
+        console.log(formData.get("dosenpengajar"));
+
+        const validation = MatkulUjianSchema.safeParse(data);
+        if(validation.success){
+            const response = await addMatkulujian(formData,arr);
+            if(response==true){
+                ref.current?.reset();
+                openModal();
+                openToast();
+            }
+            else{
+                alert("Gagal Menambahkan Mata Kuliah Ujian");
+            }
         }
         else{
-            alert("Gagal Menambahkan Pengguna");
+            setError(validation.error.issues);
+            openToastError();
         }
     }
 
@@ -94,21 +114,21 @@ export default function AddMatkulUjian(){
     }
 
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Tambah Mata Kuliah Ujian</h1>
+                    <h3><strong>Tambah Mata Kuliah Ujian</strong></h3>
                 </div>
                 <form id="form" ref={ref} action={add}>
                     <div className="d-flex flex-row w-100">
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Semester</label>
-                                <select className="form-control" name="semester">
+                                <select className="form-control" name="semester" style={{border:"2px solid black"}}>
                                     {semester.map((sem)=>(
                                         <option value={sem.id.toString()}>{sem.semester}</option>
                                         ))}
@@ -116,17 +136,17 @@ export default function AddMatkulUjian(){
                             </div>
                             <div className="form-group w-50">
                                 <label>Mata Kuliah</label>
-                                <Select options={matkul} placeholder="Pilih Mata Kuliah" isSearchable name="matkul"/>
+                                <Select options={matkul} placeholder="Pilih Mata Kuliah" isSearchable name="matkul" styles={{control: (baseStyles, state) => ({...baseStyles,border: state.isFocused ? '2px solid black' : '2px solid black',}),}}/>
                             </div>
                         </div>
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Jumlah Peserta</label>
-                                <input className="form-control" type="number" name="jumlahpeserta" placeholder="Jumlah Peserta"/>
+                                <input className="form-control" type="number" name="jumlahpeserta" placeholder="Masukan Jumlah Peserta" style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Dosen Pengajar</label>
-                                <Select options={dosen} placeholder="Pilih Dosen Pengajar" isMulti isSearchable isClearable name="dosenpengajar" onChange={handleChangeDosen}/>
+                                <Select options={dosen} placeholder="Pilih Dosen Pengajar" isMulti isSearchable isClearable name="dosenpengajar" onChange={handleChangeDosen} styles={{control: (baseStyles, state) => ({...baseStyles,border: state.isFocused ? '2px solid black' : '2px solid black',}),}}/>
                             </div>
                         </div>
                     </div>
@@ -136,6 +156,7 @@ export default function AddMatkulUjian(){
 
             <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Mata Kuliah Ujian"}/>
             <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Mata Kuliah Ujian"}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

@@ -1,20 +1,22 @@
 "use client"
 import { AddButton } from "@/app/components/buttons/AddButton";
-import { addJabatan } from "@/app/actions/jabatan";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FormSelect, Modal, Toast, ToastContainer } from "react-bootstrap";
+import { FormSelect } from "react-bootstrap";
 import ToastSuccessAdd from "../toast/SuccessAdd";
 import ModalSuccessAdd from "../modal/SuccessAdd";
 import { getSemester } from "@/app/actions/semester";
-import LoadingPengguna from "@/app/admin/aturpengawas/loading";
 import { addKonsumsiNonPengawas } from "@/app/actions/konsumsi";
+import ToastErrorInput from "../toast/ErrorInput";
+import { KonsumsiNonPengawasSchema } from "@/modules/schema";
 
 export default function AddKonsumsiNonPengawas(){
     const [isLoading,setLoading] = useState(true);
     const [modal,setModal] = useState(false);
     const [toast,setToast] = useState(false);
     const ref = useRef<HTMLFormElement>(null);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
     const [semester, setSemester] = useState(new Object);
     const router = useRouter();
 
@@ -23,6 +25,8 @@ export default function AddKonsumsiNonPengawas(){
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
 
     useEffect(() => {
         // Fetch data on component mount
@@ -40,15 +44,33 @@ export default function AddKonsumsiNonPengawas(){
         }, []);
 
     const add = async (formData:FormData) => {
-        const response = await addKonsumsiNonPengawas(formData);
-        if(response){
-            ref.current?.reset();
-            openModal();
-            openToast();
+        const data = {
+            tanggal: formData.get("tanggal"),
+            semester: formData.get("semester"),
+            masaujian: formData.get("masaujian"),
+            snack: Number(formData.get("snack")),
+            lunch: Number(formData.get("lunch")),
+            catatan: formData.get("catatan"),
+        }
+
+        const validation = KonsumsiNonPengawasSchema.safeParse(data);
+
+        if(validation.success){
+            const response = await addKonsumsiNonPengawas(formData);
+            if(response){
+                ref.current?.reset();
+                openModal();
+                openToast();
+            }
+            else{
+                alert("Gagal menambahkan konsumsi non pengawas");
+            }
         }
         else{
-            alert("Gagal menambahkan jabatan");
+            setError(validation.error.issues);
+            openToastError();
         }
+        
     }
 
     const backToHomepage = async () => {
@@ -61,9 +83,9 @@ export default function AddKonsumsiNonPengawas(){
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Tambah Konsumsi Non-Pengawas</h1>
+                    <h3><strong>Tambah Konsumsi Non-Pengawas</strong></h3>
                 </div>
                 <div>
                     <form ref={ref} action={add}>
@@ -71,7 +93,7 @@ export default function AddKonsumsiNonPengawas(){
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Semester</label>
-                                    <FormSelect name="semester">
+                                    <FormSelect name="semester" style={{border:"2px solid black"}}>
                                         {semester.map((sem)=>(
                                             <option value={sem.id}>{sem.semester}</option>
                                         ))}
@@ -79,11 +101,11 @@ export default function AddKonsumsiNonPengawas(){
                                 </div>
                                 <div className="form-group w-50">
                                     <label>Tanggal</label>
-                                    <input type="date" name="tanggal" className="form-control" placeholder="Masukan Kuota Mengawas"/>
+                                    <input type="date" name="tanggal" className="form-control" placeholder="Masukan Kuota Mengawas" style={{border:"2px solid black"}}/>
                                 </div>
                                 <div className="form-group w-50">
                                     <label>Masa Ujian</label>
-                                    <FormSelect name="masaujian">
+                                    <FormSelect name="masaujian" style={{border:"2px solid black"}}>
                                         <option value="UTS">UTS</option>
                                         <option value="UAS">UAS</option>
                                     </FormSelect>
@@ -92,15 +114,15 @@ export default function AddKonsumsiNonPengawas(){
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Jumlah Snack</label>
-                                    <input type="number" name="snack" className="form-control" placeholder="Masukan Kuota Mengawas"/>
+                                    <input type="number" name="snack" className="form-control" placeholder="Masukan Kuota Mengawas" style={{border:"2px solid black"}}/>
                                 </div>
                                 <div className="form-group w-50">
                                     <label>Jumlah Makan Siang</label>
-                                    <input type="number" name="lunch" className="form-control" placeholder="Masukan Kuota Mengawas"/>
+                                    <input type="number" name="lunch" className="form-control" placeholder="Masukan Kuota Mengawas" style={{border:"2px solid black"}}/>
                                 </div>
                                 <div className="form-group w-50">
                                     <label>Catatan</label>
-                                    <textarea name="catatan" className="form-control" placeholder="Masukan Kuota Mengawas" rows={3}/>
+                                    <textarea name="catatan" className="form-control" placeholder="Masukan Kuota Mengawas" rows={3} style={{border:"2px solid black"}}/>
                                 </div>
                             </div>
                         </div>
@@ -111,6 +133,7 @@ export default function AddKonsumsiNonPengawas(){
             
             <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Konsumsi Non-Pengawas"}/>
             <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Konsumsi Non-Pengawas"}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

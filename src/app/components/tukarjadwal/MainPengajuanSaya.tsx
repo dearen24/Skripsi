@@ -1,14 +1,17 @@
 "use client"
 import { useState, useEffect } from "react";
-import { getMyPengajuan } from "../../actions/tukarjadwal"
+import { getMyPengajuan, getOtherPengajuan } from "../../actions/tukarjadwal"
 import ItemPengajuanSaya from "./ItemPengajuanSaya";
 import { useRouter } from "next/navigation";
 import { getSemester } from "@/app/actions/semester";
-import { FormSelect } from "react-bootstrap";
+import { Card, CardBody, Col, FormSelect, Row } from "react-bootstrap";
+import ItemPengajuanLain from "./ItemPengajuanLain";
+import LoadingPage from "../LoadingPage";
 
 export default function MainPengajuanSaya({props}){
     const [isLoading,setLoading] = useState(true);
-    const [pertukaran, setPertukaran] = useState();
+    const [pertukaranSaya, setPertukaranSaya] = useState();
+    const [pertukaranLain, setPertukaranLain] = useState();
     const [session,setSession] = useState({id:props.id,semester:props.semester.id});
     const [semester, setSemester] = useState();
     const [selectedTipe, setSelectedTipe] = useState("UTS");
@@ -18,74 +21,150 @@ export default function MainPengajuanSaya({props}){
     useEffect(() => {
         // Fetch data on component mount
         const fetchData = async () => {
-            const pertukaran = await getMyPengajuan(session.id,session.semester,selectedTipe);
+            const pertukaranSaya = await getMyPengajuan(session.id,session.semester,selectedTipe);
+            const pertukaranLain = await getOtherPengajuan(session.id,session.semester,selectedTipe);
             const semester = await getSemester();
 
             setSemester(semester);
-            setPertukaran(pertukaran);
+            setPertukaranSaya(pertukaranSaya);
+            setPertukaranLain(pertukaranLain);
             setLoading(false);
         };
         fetchData();
     }, []);
 
     const changeData = async (data) => {
-        setPertukaran(data);
+        setPertukaranSaya(data);
         router.refresh();
         //openToastTambah();
     }
 
     const onChangeSemester = async (e) => {
-        const pertukaranTemp = await getMyPengajuan(session.id,e.target.value,selectedTipe);
-        setPertukaran(pertukaranTemp);
+        const pertukaranSayaTemp = await getMyPengajuan(session.id,e.target.value,selectedTipe);
+        const pertukaranLainTemp = await getOtherPengajuan(session.id,e.target.value,selectedTipe);
+        setPertukaranSaya(pertukaranSayaTemp);
+        setPertukaranLain(pertukaranLainTemp);
         setSelectedSemester(e.target.value);
     }
 
     const onChangeTipe = async (e) => {
-        const pertukaranTemp = await getMyPengajuan(session.id,selectedSemester,e.target.value);
-        setPertukaran(pertukaranTemp);
+        const pertukaranSayaTemp = await getMyPengajuan(session.id,selectedSemester,e.target.value);
+        const pertukaranLainTemp = await getOtherPengajuan(session.id,selectedSemester,e.target.value);
+        setPertukaranSaya(pertukaranSayaTemp);
+        setPertukaranLain(pertukaranLainTemp);
         setSelectedTipe(e.target.value);
     }
 
+    console.log(pertukaranSaya);
+    // console.log(pertukaranLain);
+
     if(isLoading){
-        return <p>Loading</p>
+        return <LoadingPage/>
     }
 
     return(
-        <>
-            <div className="table-responsive w-100">
-                <h1>Pengajuan Saya</h1>
-                <div className="d-flex flex-row">
-                    <div>
-                        <FormSelect onChange={onChangeSemester}>
-                            {semester.map((sem)=>(
-                                <option value={sem.id}>{sem.semester}</option>
-                            ))}
-                        </FormSelect>
-                    </div>
-                    <div>
-                        <FormSelect onChange={onChangeTipe}>
-                            <option value="UTS">UTS</option>
-                            <option value="UAS">UAS</option>
-                        </FormSelect>
-                    </div>
-                </div>
-                <div className="table-wrapper">
-                    <table className="table table-hover align-middle">
-                        <thead className="table-dark">
-                            <tr className="">    
-                                <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Dari</th>
-                                <th className="text-center"></th>					
-                                <th className="text-center">Ke</th>
-                                <th className="text-center">Status</th>
-                                <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
-                            </tr>
-                        </thead>
-                        {pertukaran.map((item)=>(
-                            <ItemPengajuanSaya item={item} pertukaran={pertukaran} setPertukaran={changeData}/>
+        <div className="d-flex flex-column w-100 h-100">
+            <div className="upper mx-1">
+                <h3><strong>Pengajuan Saya</strong></h3>
+            </div>
+            <div className="d-flex flex-row my-1">
+                <div>
+                    <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
+                        {semester.map((sem)=>(
+                            <option value={sem.id}>{sem.semester}</option>
                         ))}
-                    </table>
+                    </FormSelect>
+                </div>
+                <div className="px-1">
+                    <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
+                        <option value="UTS">UTS</option>
+                        <option value="UAS">UAS</option>
+                    </FormSelect>
                 </div>
             </div>
-        </>    
+            <div className="content mx-1">
+                <Card style={{backgroundColor:"#272829",color:"white"}}>
+                    <CardBody>
+                        <Row className="text-center">
+                            <Col>
+                                <strong>Dari</strong>
+                            </Col>
+                            <Col xs="1">
+                                <strong></strong>
+                            </Col>
+                            <Col>
+                                <strong>Ke</strong>
+                            </Col>
+                            <Col>
+                                <strong>Status</strong>
+                            </Col>
+                            <Col>
+                                <strong>Action</strong>
+                            </Col>
+                        </Row>
+                    </CardBody>
+                </Card>
+                {pertukaranSaya.map((item)=>(
+                    item.pertukaran.statusDosen2!="Disetujui"||item.pertukaran.statusAdmin!="Disetujui" ?
+                        <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
+                    :
+                        null 
+                ))}
+                {pertukaranLain.map((item)=>(
+                    item.pertukaran.statusDosen2=="Disetujui"&&item.pertukaran.statusAdmin=="Disetujui" ?
+                        <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
+                    :
+                        null 
+                ))}
+            </div>
+        </div>
     )
+
+    // return(
+    //     <>
+    //         <div className="table-responsive w-100">
+    //             <h1>Pengajuan Saya</h1>
+    //             <div className="d-flex flex-row">
+    //                 <div>
+    //                     <FormSelect onChange={onChangeSemester}>
+    //                         {semester.map((sem)=>(
+    //                             <option value={sem.id}>{sem.semester}</option>
+    //                         ))}
+    //                     </FormSelect>
+    //                 </div>
+    //                 <div>
+    //                     <FormSelect onChange={onChangeTipe}>
+    //                         <option value="UTS">UTS</option>
+    //                         <option value="UAS">UAS</option>
+    //                     </FormSelect>
+    //                 </div>
+    //             </div>
+    //             <div className="table-wrapper">
+    //                 <table className="table table-hover align-middle">
+    //                     <thead className="table-dark">
+    //                         <tr className="">    
+    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Dari</th>
+    //                             <th className="text-center"></th>					
+    //                             <th className="text-center">Ke</th>
+    //                             <th className="text-center">Status</th>
+    //                             <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
+    //                         </tr>
+    //                     </thead>
+    //                     {pertukaranSaya.map((item)=>(
+    //                         item.pertukaran.statusDosen2!="Disetujui"&&item.pertukaran.statusAdmin!="Disetujui" ?
+    //                             <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
+    //                         :
+    //                            null 
+    //                     ))}
+    //                     {pertukaranLain.map((item)=>(
+    //                         item.pertukaran.statusDosen2=="Disetujui"&&item.pertukaran.statusAdmin=="Disetujui" ?
+    //                             <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
+    //                         :
+    //                            null 
+    //                     ))}
+    //                 </table>
+    //             </div>
+    //         </div>
+    //     </>    
+    // )
 }

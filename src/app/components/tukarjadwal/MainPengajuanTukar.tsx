@@ -2,10 +2,14 @@
 import { useState, useEffect } from "react";
 import { getMyJadwal, getMyPengajuan, getOtherJadwal, insertPertukaran } from "../../actions/tukarjadwal"
 import ItemPengajuanSaya from "./ItemPengajuanSaya";
-import { FormSelect, ListGroup, Tab, Tabs } from "react-bootstrap";
+import { Card, Col, FormSelect, ListGroup, Row, Tab, Tabs } from "react-bootstrap";
 import ItemJadwalSaya from "./ItemJadwalSaya";
 import ItemJadwalDosenLain from "./ItemJadwalDosenLain";
 import { getSemester } from "@/app/actions/semester";
+import MakePertukaranModal from "../modal/MakePertukaranConfirmation";
+import ToastSuccessMakePertukaran from "../toast/SuccessMakePertukaran";
+import ModalCannotMakePertukaran from "../modal/CannotMakePertukaran";
+import LoadingPage from "../LoadingPage";
 
 export default function MainPengajuanTukar({props}){
     const [isLoading,setLoading] = useState(true);
@@ -18,6 +22,24 @@ export default function MainPengajuanTukar({props}){
     const [semester,setSemester] = useState();
     const [selectedSemester,setSelectedSemester] = useState(props.semester.id);
     const [selectedTipe,setSelectedTipe] = useState("UTS");
+    const [modal, setModal] = useState(false);
+    const [modalFailed, setModalFailed] = useState(false);
+    const [toast,setToast] = useState(false);
+
+    const openModal = () => {
+        if(selectedJadwalSaya==""||selectedJadwalDosenLain==""){
+            setModalFailed(true);
+        }
+        else{
+            setModal(true);
+        }
+    };
+
+    const closeModal = () => setModal(false);
+    const closeModalFailed = () => setModalFailed(false);
+    const openToast = () => setToast(true);
+    const closeToast = () => setToast(false);
+
 
     useEffect(() => {
         // Fetch data on component mount
@@ -50,6 +72,8 @@ export default function MainPengajuanTukar({props}){
 
     const buatPertukaran = async () => {
         await insertPertukaran(selectedJadwalSaya,selectedJadwalDosenLain,session.semester);
+        openToast();
+        closeModal();
     }
 
     const onChangeSemester = async (e) => {
@@ -99,95 +123,95 @@ export default function MainPengajuanTukar({props}){
     }
 
     if(isLoading){
-        return <p>Loading</p>
+        return <LoadingPage/>
     }
 
     return(
         <>
             <div className="table-responsive w-100">
-                <h1>Pengajuan Pertukaran</h1>
+                <h3 className="mx-1"><strong>Pengajuan Pertukaran</strong></h3>
                 <div className="d-flex flex-row">
-                    <div>
-                        <FormSelect onChange={onChangeSemester}>
+                    <div className="px-1">
+                        <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
                             {semester.map((sem)=>(
                                 <option value={sem.id}>{sem.semester}</option>
                             ))}
                         </FormSelect>
                     </div>
                     <div>
-                        <FormSelect onChange={onChangeTipe}>
+                        <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
                         </FormSelect>
                     </div>
                 </div>
-                <div>
-                    <div className="d-flex flex-row">
-                        <div >
-                            <h6>Dari</h6>
-                        </div>
-                        <div className="px-2">
-                            <ListGroup className="d-flex flex-row">
-                                    {jadwalSaya.map((jadwal)=>(
-                                        selectedJadwalSaya == jadwal.id ?
-                                        <>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+jadwal.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            {jadwal.ujian.matkul.map((matkul)=>(
-                                                <h6>{matkul.nama}</h6>
-                                            ))}
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ruangan.nama}</h6>
-                                        </ListGroup.Item>
-                                        </>
-                                        :
-                                        null
-                                    ))}
-                            </ListGroup>
-                        </div>
+                <div className="mx-1">
+                    <div className="d-flex flex-row my-1">
+                        <Card className="px-2" style={{border:"2px solid black"}}>
+                            <Row className="align-items-center">
+                                <Col md="auto">
+                                    <h6 className="my-2">Dari:</h6>
+                                </Col>
+                                {jadwalSaya.map((jadwal)=>(
+                                    selectedJadwalSaya == jadwal.id ?
+                                    <>
+                                    <Col md="auto">
+                                        <h6 className="my-2">{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</h6>
+                                    </Col>
+                                    <Col md="auto">
+                                        <h6 className="my-2">{jadwal.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+jadwal.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</h6>
+                                    </Col>
+                                    <Col md="auto">
+                                        {jadwal.ujian.matkul.map((matkul)=>(
+                                            <h6 className="my-2">{matkul.nama}</h6>
+                                        ))}
+                                    </Col>
+                                    <Col md="auto">
+                                        <h6 className="my-2">{jadwal.ruangan.nama}</h6>
+                                    </Col>
+                                    </>
+                                    :
+                                    null
+                                ))}
+                            </Row>
+                        </Card>
                     </div>
-                    <div className="d-flex flex-row">
-                        <div>
-                            <h6>Ke</h6>
-                        </div>
-                        <div className="px-2">
-                            <ListGroup className="d-flex flex-row">
+                    <div className="d-flex flex-row my-1">
+                        <Card className="px-2" style={{border:"2px solid black"}}>
+                            <Row className="align-items-center">
+                                    <Col md="auto">
+                                        <h6 className="my-2">Ke:</h6>
+                                    </Col>
                                     {jadwalDosenLain.map((jadwal)=>(
                                         selectedJadwalDosenLain == jadwal.id ?
                                         <>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+jadwal.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
+                                        <Col md="auto">
+                                            <h6 className="my-2">{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</h6>
+                                        </Col>
+                                        <Col md="auto">
+                                            <h6 className="my-2">{jadwal.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+jadwal.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</h6>
+                                        </Col>
+                                        <Col md="auto">
                                             {jadwal.ujian.matkul.map((matkul)=>(
-                                                <h6>{matkul.nama}</h6>
+                                                <h6 className="my-2">{matkul.nama}</h6>
                                             ))}
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.ruangan.nama}</h6>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item>
-                                            <h6>{jadwal.dosen.nama}</h6>
-                                        </ListGroup.Item>
+                                        </Col>
+                                        <Col md="auto">
+                                            <h6 className="my-2">{jadwal.ruangan.nama}</h6>
+                                        </Col>
+                                        <Col md="auto">
+                                            <h6 className="my-2">{jadwal.dosen.nama}</h6>
+                                        </Col>
                                         </>
                                         :
                                         null
                                     ))}
-                            </ListGroup>
-                        </div>
+                            </Row>
+                        </Card>
                     </div>
                 </div>
-                <button className="btn btn-primary" onClick={buatPertukaran}>Ajukan Pertukaran</button>
-                <div>
+                <button className="btn my-1 mx-1" onClick={openModal} style={{backgroundColor:"#272829", color:"white"}}>Ajukan Pertukaran</button>
+                <div className="mx-1">
                     <Tabs
                         id="controlled-tab-example"
                         activeKey={key}
@@ -203,6 +227,10 @@ export default function MainPengajuanTukar({props}){
                     </Tabs>
                 </div>
             </div>
+
+            <MakePertukaranModal modal={modal} closeModal={closeModal} onAction={buatPertukaran}/>
+            <ModalCannotMakePertukaran modal={modalFailed} closeModal={closeModalFailed}/>
+            <ToastSuccessMakePertukaran toast={toast} closeToast={closeToast}/>
         </>    
     )
 }

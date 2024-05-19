@@ -5,9 +5,10 @@ import { getJabatan } from "@/app/actions/jabatan";
 import { useRouter } from "next/navigation";
 import { Accordion, CloseButton, Form, Toast, ToastContainer } from "react-bootstrap";
 import ToastSuccessDelete from "../toast/SuccessDelete";
-import { getUjianRuanganDosenGroupByDate } from "@/app/actions/ujian";
+import { getUjianBySemester, getUjianRuanganDosenGroupByDate } from "@/app/actions/ujian";
 import ItemJadwal from "./ItemJadwal";
 import { getSemester } from "@/app/actions/semester";
+import LoadingPage from "../LoadingPage";
 
 
 export default function MainJadwal({props}){
@@ -20,7 +21,7 @@ export default function MainJadwal({props}){
         // Fetch data on component mount
         const fetchData = async () => {
             try {
-                const data = await getUjianRuanganDosenGroupByDate(selectedData.semester,selectedData.tipe);
+                const data = await getUjianBySemester(selectedData.semester,selectedData.tipe);
                 const semester = await getSemester();
                 const arr = [];
                 let index = 0;
@@ -82,7 +83,7 @@ export default function MainJadwal({props}){
         const dataTemp = {...selectedData};
         dataTemp.semester = e.target.value;
         setSelectedData(dataTemp);
-        const data = await getUjianRuanganDosenGroupByDate(dataTemp.semester,dataTemp.tipe);
+        const data = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
         const arr = [];
         let index = 0;
         for(let i = 0;i<data.length;i++){
@@ -135,7 +136,7 @@ export default function MainJadwal({props}){
         const dataTemp = {...selectedData};
         dataTemp.tipe = e.target.value;
         setSelectedData(dataTemp);
-        const data = await getUjianRuanganDosenGroupByDate(dataTemp.semester,dataTemp.tipe);
+        const data = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
         const arr = [];
         let index = 0;
         for(let i = 0;i<data.length;i++){
@@ -185,33 +186,33 @@ export default function MainJadwal({props}){
     }
     
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>
             <div className="table-responsive w-100">
-                <h1>Jadwal Dosen</h1>
+                <h3 className="mx-1"><strong>Jadwal Dosen</strong></h3>
                 <div className="table-wrapper">
-                    <div className="d-flex flex-row">
+                    <div className="d-flex flex-row my-1 mx-1">
                         <div className="dropdown">
-                            <Form.Select onChange={handleChangeSemester} aria-label="Semester">
+                            <Form.Select onChange={handleChangeSemester} aria-label="Semester" style={{border:"2px solid black"}}>
                                 {semester.map((sem)=>(
                                     sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                                 ))}
                             </Form.Select>
                         </div>
                         <div className="dropdown mx-1">
-                            <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian">
+                            <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian" style={{border:"2px solid black"}}>
                                 <option value="UTS" selected>UTS</option>
                                 <option value="UAS">UAS</option>
                             </Form.Select>
                         </div>
                     </div>
                 {jadwal.map((data)=>(
-                    <Accordion>
+                    <Accordion className="mx-1 my-1" style={{border:"2px solid black",borderRadius:"8px"}}>
                         <Accordion.Item eventKey="0">
-                            <Accordion.Header>{String(data[0].date).split(" ")[0]+", "+String(data[0].date).split(" ")[1]+" "+String(data[0].date).split(" ")[2]+" "+String(data[0].date).split(" ")[3]}</Accordion.Header>
+                            <Accordion.Header><strong>{String(data[0].date).split(" ")[0]+", "+String(data[0].date).split(" ")[1]+" "+String(data[0].date).split(" ")[2]+" "+String(data[0].date).split(" ")[3]}</strong></Accordion.Header>
                             <Accordion.Body>
                                 <ItemJadwal data={data}/>
                             </Accordion.Body>

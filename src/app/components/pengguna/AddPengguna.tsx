@@ -4,16 +4,21 @@ import { addUser } from "@/app/actions/user";
 import { getJabatan } from "@/app/actions/jabatan"
 import { useEffect,useRef,useState } from "react";
 import { useRouter } from "next/navigation";
-import { Modal, Toast, ToastContainer } from "react-bootstrap";
 import ToastSuccessAdd from "../toast/SuccessAdd";
 import ModalSuccessAdd from "../modal/SuccessAdd";
+import LoadingPage from "../LoadingPage";
+import ToastErrorInput from "../toast/ErrorInput";
+import { PenggunaSchema } from "@/modules/schema";
 
 export default function AddUser(){
     const [isLoading,setLoading] = useState(true);
     const [jabatan,setJabatan] = useState(new Object);
     const [modal,setModal] = useState(false);
     const [toast,setToast] = useState(false);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
     const ref = useRef<HTMLFormElement>(null);
+    
     const router = useRouter();
 
     const closeModal = () => setModal(false);
@@ -22,18 +27,35 @@ export default function AddUser(){
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
 
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
+
     const backToHomepage = () => router.push("/admin/dosen");
 
     async function add(formData:FormData){
-        const response = await addUser(formData);
-        //const response = true;
-        if(response==true){
-            ref.current?.reset();
-            openModal();
-            openToast();
+        const data = {
+            email: formData.get("email"),
+            nik: formData.get("NIK"),
+            nama: formData.get("nama"),
+            jabatan: formData.get("jabatan"),
+        }
+
+        const validation = PenggunaSchema.safeParse(data);
+
+        if(validation.success){
+            const response = await addUser(formData);
+            if(response==true){
+                ref.current?.reset();
+                openModal();
+                openToast();
+            }
+            else{
+                alert("Gagal Menambahkan Pengguna");
+            }
         }
         else{
-            alert("Gagal Menambahkan Pengguna");
+            setError(validation.error.issues);
+            openToastError();
         }
     }
 
@@ -52,35 +74,35 @@ export default function AddUser(){
         }, []);
 
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Tambah Pengguna</h1>
+                    <h3><strong>Tambah Pengguna</strong></h3>
                 </div>
                 <form id="form" ref={ref} action={add}>
                     <div className="d-flex flex-row w-100">
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Email address</label>
-                                <input type="email" name="email" className="form-control" aria-describedby="emailHelp" placeholder="Enter email"/>
+                                <input name="email" className="form-control" placeholder="Masukan email pengguna" style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>NIK</label>
-                                <input className="form-control" name="NIK" placeholder="NIK"/>
+                                <input className="form-control" name="NIK" placeholder="Masukan NIK pengguna" style={{border:"2px solid black"}}/>
                             </div>
                         </div>
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Nama</label>
-                                <input className="form-control" name="nama" placeholder="Nama"/>
+                                <input className="form-control" name="nama" placeholder="Masukan Nama Pengguna" style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Jabatan</label>
-                                <select className="form-control" name="jabatan">
+                                <select className="form-control" name="jabatan" style={{border:"2px solid black"}}>
                                     {jabatan.map((role)=>(
                                         <option value={role.id.toString()}>{role.nama}</option>
                                         ))}
@@ -94,6 +116,7 @@ export default function AddUser(){
 
             <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Pengguna"}/>
             <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Pengguna"}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

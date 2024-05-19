@@ -7,7 +7,8 @@ import LoadingPengguna from "../../admin/dosen/loading";
 import ToastSuccessDelete from "../toast/SuccessDelete";
 import ItemRuanganUjian from "./ItemRuanganUjian";
 import { getSemester } from "@/app/actions/semester";
-import { FormSelect } from "react-bootstrap";
+import { Card, CardBody, Col, FormSelect, Row } from "react-bootstrap";
+import LoadingPage from "../LoadingPage";
 
 export default function MainRuanganUjian({props}){
     const [isLoading,setLoading] = useState(true);
@@ -83,6 +84,9 @@ export default function MainRuanganUjian({props}){
             }
         }
 
+        if(ujianDate.length!=0){
+            dataTemp.date = ujianDate[0][0].date.toISOString();
+        }
         setSelectedData(dataTemp);
         setUjian(ujianDate);
     }
@@ -111,7 +115,10 @@ export default function MainRuanganUjian({props}){
                 ujianDate.push([ujianTemp[i]]);
             }
         }
-
+        
+        if(ujianDate.length!=0){
+            dataTemp.date = ujianDate[0][0].date.toISOString();
+        }
         setSelectedData(dataTemp);
         setUjian(ujianDate);
     }
@@ -123,29 +130,30 @@ export default function MainRuanganUjian({props}){
     }
 
     if(isLoading){
-        return <LoadingPengguna/>
+        return <LoadingPage/>
     }
-    
+
     return(
-        <>
-            <div className="table-responsive w-100">
-                <h1>Ruangan Ujian</h1>
-                <div className="d-flex flex-row align-items-center">
-                    <div className="px-1">
-                        <FormSelect onChange={handleChangeSemester}>
-                            {semester.map((sem)=>(
+        <div className="d-flex flex-column w-100 h-100">
+            <div className="upper mx-1">
+                <h3><strong>Ruangan Ujian</strong></h3>
+            </div>
+            <div className="d-flex flex-row align-items-center mb-1">
+                     <div className="px-1">
+                         <FormSelect onChange={handleChangeSemester} style={{border:"2px solid black"}}>
+                             {semester.map((sem)=>(
                                 sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                             ))}
                         </FormSelect>
                     </div>
-                    <div className="px-1">
-                        <FormSelect onChange={handleChangeTipe}>
+                    <div className="">
+                        <FormSelect onChange={handleChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS" selected>UTS</option>
                             <option value="UAS">UAS</option>
                         </FormSelect>
                     </div>
-                    <div className="">
-                        <FormSelect onChange={handleChangeDate}>
+                    <div className="px-1">
+                        <FormSelect onChange={handleChangeDate} style={{border:"2px solid black"}}>
                             {ujian.map((u)=>(
                                 u[0].date.toISOString()==selectedData.date ?
                                 <option value={u[0].date.toISOString()} selected>{u[0].date.toDateString().split(" ")[0]+", "+u[0].date.toDateString().split(" ")[2]+" "+u[0].date.toDateString().split(" ")[1]+" "+u[0].date.toDateString().split(" ")[3]}</option>
@@ -155,34 +163,107 @@ export default function MainRuanganUjian({props}){
                         </FormSelect>
                     </div>
                 </div>
-                <div className="table-wrapper">
-                    <table className="table table-hover align-middle">
-                        <thead className="table-dark">
-                            <tr className="">    
-                                <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Tanggal</th>						
-                                <th className="text-center">Waktu Mulai</th>
-                                <th className="text-center">Waktu Selesai</th>
-                                <th className="text-center">Tipe Ujian</th>
-                                <th className="text-center">Metode Ujian</th>
-                                <th className="text-center">Shift</th>
-                                <th className="text-center">Ruangan</th>
-                                <th className="text-center">Mata Kuliah</th>
-                                <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
-                            </tr>
-                        </thead>
-                        {ujian.map((uj)=>(
-                            selectedData.date==uj[0].date.toISOString() ?
-                            uj.map((u)=>(
-                                <ItemRuanganUjian key={u.id} ujian={u} allUjian={ujian}/>
-                            ))
-                            :
-                            null
-                        ))}
-                    </table>
-                </div>
+            <div className="content mx-1">
+                <Card style={{backgroundColor:"#272829",color:"white"}}>
+                    <CardBody>
+                        <Row className="text-center">
+                            <Col>
+                                <strong>Waktu Mulai</strong>
+                            </Col>
+                            <Col>
+                                <strong>Waktu Selesai</strong>
+                            </Col>
+                            <Col>
+                                <strong>Metode</strong>
+                            </Col>
+                            <Col>
+                                <strong>Masa Ujian</strong>
+                            </Col>
+                            <Col>
+                                <strong>Shift</strong>
+                            </Col>
+                            <Col>
+                                <strong>Ruangan</strong>
+                            </Col>
+                            <Col>
+                                <strong>Mata Kuliah</strong>
+                            </Col>
+                            <Col>
+                                <strong>Action</strong>
+                            </Col>
+                        </Row>
+                    </CardBody>
+                </Card>
+                {ujian.map((uj)=>(
+                    selectedData.date==uj[0].date.toISOString() ?
+                    uj.map((u)=>(
+                        <ItemRuanganUjian key={u.id} ujian={u} allUjian={ujian}/>
+                    ))
+                    :
+                    null
+                ))}
             </div>
-
-            <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Ujian"}/>
-        </>
+            <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Pengguna"}/>
+        </div>
     )
+    
+    // return(
+    //     <>
+    //         <div className="table-responsive w-100">
+    //             <h1>Ruangan Ujian</h1>
+    //             <div className="d-flex flex-row align-items-center">
+    //                 <div className="px-1">
+    //                     <FormSelect onChange={handleChangeSemester}>
+    //                         {semester.map((sem)=>(
+    //                             sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
+    //                         ))}
+    //                     </FormSelect>
+    //                 </div>
+    //                 <div className="px-1">
+    //                     <FormSelect onChange={handleChangeTipe}>
+    //                         <option value="UTS" selected>UTS</option>
+    //                         <option value="UAS">UAS</option>
+    //                     </FormSelect>
+    //                 </div>
+    //                 <div className="">
+    //                     <FormSelect onChange={handleChangeDate}>
+    //                         {ujian.map((u)=>(
+    //                             u[0].date.toISOString()==selectedData.date ?
+    //                             <option value={u[0].date.toISOString()} selected>{u[0].date.toDateString().split(" ")[0]+", "+u[0].date.toDateString().split(" ")[2]+" "+u[0].date.toDateString().split(" ")[1]+" "+u[0].date.toDateString().split(" ")[3]}</option>
+    //                             :
+    //                             <option value={u[0].date.toISOString()}>{u[0].date.toDateString().split(" ")[0]+", "+u[0].date.toDateString().split(" ")[2]+" "+u[0].date.toDateString().split(" ")[1]+" "+u[0].date.toDateString().split(" ")[3]}</option>
+    //                         ))}
+    //                     </FormSelect>
+    //                 </div>
+    //             </div>
+    //             <div className="table-wrapper">
+    //                 <table className="table table-hover align-middle">
+    //                     <thead className="table-dark">
+    //                         <tr className="">    
+    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Tanggal</th>						
+    //                             <th className="text-center">Waktu Mulai</th>
+    //                             <th className="text-center">Waktu Selesai</th>
+    //                             <th className="text-center">Tipe Ujian</th>
+    //                             <th className="text-center">Metode Ujian</th>
+    //                             <th className="text-center">Shift</th>
+    //                             <th className="text-center">Ruangan</th>
+    //                             <th className="text-center">Mata Kuliah</th>
+    //                             <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
+    //                         </tr>
+    //                     </thead>
+    //                     {ujian.map((uj)=>(
+    //                         selectedData.date==uj[0].date.toISOString() ?
+    //                         uj.map((u)=>(
+    //                             <ItemRuanganUjian key={u.id} ujian={u} allUjian={ujian}/>
+    //                         ))
+    //                         :
+    //                         null
+    //                     ))}
+    //                 </table>
+    //             </div>
+    //         </div>
+
+    //         <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Ujian"}/>
+    //     </>
+    // )
 }

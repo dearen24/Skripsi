@@ -6,11 +6,11 @@ const ItemJadwal = (props) => {
     return(
         <>
             {props.data.map((ujian)=>(
-                <Accordion>
+                <Accordion className="mx-1 my-1" style={{border:"2px solid black",borderRadius:"8px"}}>
                     <Accordion.Item eventKey="0">
                         <Accordion.Header>
                             <div className="px-2 w-100">
-                                <table className="table table-bordered align-middle">
+                                <table className="table align-middle">
                                     <tbody>
                                         <tr>
                                             <th>
@@ -50,7 +50,7 @@ const ItemJadwal = (props) => {
                         </Accordion.Header>
                         <Accordion.Body>
                             <div className="w-100">
-                                <table className="table table-bordered align-middle">
+                                <table className="table align-middle">
                                     <tbody>
                                         {ujian.ruangandosen.map((item,index)=>(
                                             <tr>

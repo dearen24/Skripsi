@@ -6,12 +6,16 @@ import { useRouter } from "next/navigation";
 import ToastSuccessAdd from "../toast/SuccessAdd";
 import ModalSuccessAdd from "../modal/SuccessAdd";
 import ModalMultipleActiveSemesterAlert from "../modal/MultipleActiveSemester";
+import { SemesterSchema } from "@/modules/schema";
+import ToastErrorInput from "../toast/ErrorInput";
 
 export default function AddSemester(){
     const [modal,setModal] = useState(false);
     const [modalSemester,setModalSemester] = useState(false);
     const [toast,setToast] = useState(false);
     const ref = useRef<HTMLFormElement>(null);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
     const router = useRouter();
 
     const closeModal = () => setModal(false);
@@ -21,6 +25,9 @@ export default function AddSemester(){
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
+
 
     const backToHomepage = () => router.push("/admin/semester");
 
@@ -30,23 +37,41 @@ export default function AddSemester(){
             openModalSemester();
         }
         else{
-            const response = await addSemester(formData);
-            if(response==true){
-                ref.current?.reset();
-                openModal();
-                openToast();
+            let status = false;
+            if(formData.get("status")?.toString()=="Aktif"){
+                status = true;
+            }
+
+            const data = {
+                semester: formData.get("semester"),
+                status: status,
+            }
+    
+            const validation = SemesterSchema.safeParse(data);
+    
+            if(validation.success){
+                const response = await addSemester(formData);
+                if(response==true){
+                    ref.current?.reset();
+                    openModal();
+                    openToast();
+                }
+                else{
+                    alert("Gagal menambahkan jabatan");
+                }
             }
             else{
-                alert("Gagal menambahkan jabatan");
+                setError(validation.error.issues);
+                openToastError();
             }
         }
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Tambah Semester</h1>
+                    <h3><strong>Tambah Semester</strong></h3>
                 </div>
                 <div>
                     <form ref={ref} action={add}>
@@ -54,13 +79,13 @@ export default function AddSemester(){
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Nama Semester</label>
-                                    <input type="text" name="semester" className="form-control" placeholder="Masukan Nama Jabatan"/>
+                                    <input type="text" name="semester" className="form-control" placeholder="Masukan nama semester" style={{border:"2px solid black"}}/>
                                 </div>
                             </div>
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Semester</label>
-                                    <select className="form-control" name="status">
+                                    <select className="form-control" name="status" style={{border:"2px solid black"}}>
                                         <option value="Aktif">Aktif</option>
                                         <option value="Tidak Aktif">Tidak Aktif</option>
                                     </select>
@@ -74,7 +99,8 @@ export default function AddSemester(){
             
             <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Jabatan"}/>
             <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Jabatan"}/>
-            <ModalMultipleActiveSemesterAlert modal={modalSemester} closeModal={closeModalSemester} />
+            <ModalMultipleActiveSemesterAlert modal={modalSemester} closeModal={closeModalSemester} action={"Menambahkan"}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

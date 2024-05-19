@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { EditButton } from "../buttons/EditButton";
+import { Card, CardBody, Col, Row } from "react-bootstrap";
 
 const ItemRuanganUjian = (ujian) => {
     const [ruangan,setRuangan] = useState(new Array);
@@ -29,33 +30,72 @@ const ItemRuanganUjian = (ujian) => {
     }, []);
 
     return(
-        <tbody>
-            <tr>
-                <td className="text-center">{date[0]+", "+date[1]+" "+date[2]+" "+date[3]}</td>
-                <td className="text-center">{mulai}</td>
-                <td className="text-center">{selesai}</td>                        
-                <td className="text-center">{ujian.ujian.metode}</td>
-                <td className="text-center">{ujian.ujian.tipe}</td>
-                <td className="text-center">{ujian.ujian.shift}</td>
-                {ujian.ujian.ujian.length==0 ? <td className="text-center">-</td> : 
-                <td className="text-center">
-                    {ruangan.map((ruangan)=>(
-                        <div><a>{ruangan.nama}</a></div>    
-                    ))}    
-                </td>}
-                <td className="text-center">
-                    {ujian.ujian.matkul.map((matkul)=>(
-                        <div><a>{matkul.nama}</a></div>    
-                    ))}
-                </td>
-                <td className="text-center">
-                    <div className="d-flex flex-row justify-content-center">
-                        <EditButton page={"Ruangan Ujian"} idUjian={ujian.ujian.id}/>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
+        <Card className="my-1" style={{borderRadius:"10px"}}>
+            <CardBody>
+                <Row className="text-center">
+                    <Col className="align-content-center">
+                        <strong>{mulai}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        <strong>{selesai}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        <strong>{ujian.ujian.metode}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        <strong>{ujian.ujian.tipe}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        <strong>{ujian.ujian.shift}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        {ruangan.map((ruangan)=>(
+                            <div><strong>{ruangan.nama}</strong></div>    
+                        ))}
+                    </Col>
+                    <Col className="align-content-center">
+                        {ujian.ujian.matkul.map((matkul)=>(
+                            <div><strong>{matkul.nama}</strong></div>    
+                        ))}
+                    </Col>
+                    <Col className="align-content-center">
+                        <div className="d-flex flex-row justify-content-center">
+                         <EditButton page={"Ruangan Ujian"} idUjian={ujian.ujian.id}/>
+                      </div>
+                    </Col>
+                </Row>
+            </CardBody>
+        </Card>
     )
+
+    // return(
+    //     <tbody>
+    //         <tr>
+    //             <td className="text-center">{date[0]+", "+date[1]+" "+date[2]+" "+date[3]}</td>
+    //             <td className="text-center">{mulai}</td>
+    //             <td className="text-center">{selesai}</td>                        
+    //             <td className="text-center">{ujian.ujian.metode}</td>
+    //             <td className="text-center">{ujian.ujian.tipe}</td>
+    //             <td className="text-center">{ujian.ujian.shift}</td>
+    //             {ujian.ujian.ujian.length==0 ? <td className="text-center">-</td> : 
+    //             <td className="text-center">
+    //                 {ruangan.map((ruangan)=>(
+    //                     <div><a>{ruangan.nama}</a></div>    
+    //                 ))}    
+    //             </td>}
+    //             <td className="text-center">
+    //                 {ujian.ujian.matkul.map((matkul)=>(
+    //                     <div><a>{matkul.nama}</a></div>    
+    //                 ))}
+    //             </td>
+    //             <td className="text-center">
+    //                 <div className="d-flex flex-row justify-content-center">
+    //                     <EditButton page={"Ruangan Ujian"} idUjian={ujian.ujian.id}/>
+    //                 </div>
+    //             </td>
+    //         </tr>
+    //     </tbody>
+    // )
 }
 
 export default ItemRuanganUjian;

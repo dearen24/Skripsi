@@ -5,10 +5,13 @@ export async function getAturanKonsumsi(){
     try{
         const aturan = await db.rules.findMany({
             select:{
-                sebelum12:true,
-                melewati12:true,
-                setelah12:true,
-                konsumsi:true,
+                delapanSepuluh:true,
+                sepuluhDuaBelas:true,
+                sebelasTigaBelas:true,
+                duaBelasDua:true,
+                duaEmpat:true,
+                snack:true,
+                lunch:true,
             }
         });
         return aturan;
@@ -16,6 +19,22 @@ export async function getAturanKonsumsi(){
     catch{
         return false;
     }
+}
+
+export async function getKonsumsi(date,tipe,semester){
+    const allUjian = await db.$queryRaw`
+        SELECT
+            SUM("ExamRoomLec"."lunch") as "lunch",
+            SUM("ExamRoomLec"."snack") as "snack"
+        FROM
+            "Exam" INNER JOIN "ExamRoomLec"
+        ON
+            "Exam"."id" = "ExamRoomLec"."idUjian"
+        WHERE
+            "Exam"."date" = ${date}::date AND "Exam"."tipe" = ${tipe} AND "Exam"."idSemester" = ${semester}
+    `;
+
+    return allUjian;
 }
 
 export async function getAturanKonsumsiAll(){
@@ -43,17 +62,23 @@ export async function getAturanKonsumsiById(id){
 }
 
 export async function addAturanKonsumsi(formData){
-    const sebelum12 = formData.get("sebelum12").toString();
-    const melewati12 = formData.get("melewati12").toString();
-    const setelah12 = formData.get("setelah12").toString();
-    const konsumsi = formData.get("konsumsi").toString();
+    const delapanSepuluh = Number(formData.get("delapanSepuluh"));
+    const sepuluhDuaBelas = Number(formData.get("sepuluhDuaBelas"));
+    const duaBelasDua = Number(formData.get("duaBelasDua"));
+    const sebelasTigaBelas = Number(formData.get("sebelasTigaBelas"));
+    const duaEmpat = Number(formData.get("duaEmpat"));
+    const snack = formData.get("snack");
+    const lunch = formData.get("lunch");
     try{
         await db.rules.create({
             data:{
-                sebelum12:Boolean(sebelum12),
-                melewati12:Boolean(melewati12),
-                setelah12:Boolean(setelah12),
-                konsumsi:String(konsumsi)
+                delapanSepuluh:Boolean(delapanSepuluh),
+                sepuluhDuaBelas:Boolean(sepuluhDuaBelas),
+                duaBelasDua:Boolean(duaBelasDua),
+                sebelasTigaBelas:Boolean(sebelasTigaBelas),
+                duaEmpat:Boolean(duaEmpat),
+                snack:Number(snack),
+                lunch:Number(lunch),
             }
         });
         return true;
@@ -65,32 +90,32 @@ export async function addAturanKonsumsi(formData){
 }
 
 export async function editAturanKonsumsi(formData,id){
-    const sebelum12 = formData.get("sebelum12").toString();
-    const melewati12 = formData.get("melewati12").toString();
-    const setelah12 = formData.get("setelah12").toString();
-    const konsumsi = formData.get("konsumsi").toString();
+    const delapanSepuluh = Number(formData.get("delapanSepuluh"));
+    const sepuluhDuaBelas = Number(formData.get("sepuluhDuaBelas"));
+    const duaBelasDua = Number(formData.get("duaBelasDua"));
+    const sebelasTigaBelas = Number(formData.get("sebelasTigaBelas"));
+    const duaEmpat = Number(formData.get("duaEmpat"));
+    const snack = formData.get("snack");
+    const lunch = formData.get("lunch");
     try{
         await db.rules.update({
             where:{
                 id:String(id),
             },
             data:{
-                sebelum12:{
-                    set:Boolean(sebelum12)
-                },
-                melewati12:{
-                    set:Boolean(melewati12)
-                },
-                setelah12:{
-                    set:Boolean(setelah12)
-                },
-                konsumsi:String(konsumsi)
+                delapanSepuluh:Boolean(delapanSepuluh),
+                sepuluhDuaBelas:Boolean(sepuluhDuaBelas),
+                duaBelasDua:Boolean(duaBelasDua),
+                sebelasTigaBelas:Boolean(sebelasTigaBelas),
+                duaEmpat:Boolean(duaEmpat),
+                snack:Number(snack),
+                lunch:Number(lunch),
             }
         });
         return true;
     }
     catch(err){
-        console.error("Gagal menambahkan Aturan Konsumsi: ",err);
+        console.error("Gagal mengubah Aturan Konsumsi: ",err);
         return false;
     }
 }
@@ -151,30 +176,19 @@ export async function getAllExamDateDosen(date,dosen){
     }
 }
 
-export async function addKonsumsiDosen(idUjianRuanganDosen,konsumsi){
+export async function addKonsumsiDosen(idUjianRuanganDosen,snack,lunch){
     try{
+        await db.examRoomLec.update({
+            where:{
+                id:String(idUjianRuanganDosen),
+            },
+            data:{
+                snack:Number(snack),
+                lunch:Number(lunch),
+            }
+        })
         
-        if(konsumsi=="lunch"){
-            await db.examRoomLec.update({
-                where:{
-                    id:String(idUjianRuanganDosen),
-                },
-                data:{
-                    lunch:1,
-                }
-            })
-        }
-        else if(konsumsi=="snack"){
-            await db.examRoomLec.update({
-                where:{
-                    id:String(idUjianRuanganDosen),
-                },
-                data:{
-                    snack:1,
-                }
-            })
-        }
-        return ujian;
+        return true;
     }
     catch(err){
         console.error(err);

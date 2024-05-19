@@ -19,6 +19,21 @@ export async function getUjian(){
     return allUjian;
 }
 
+export async function getDatesBySemester(semester,masaujian){
+    const dates = await db.exam.findMany({
+        select:{
+            date:true,
+        },
+        where:{
+            idSemester:semester,
+            tipe:masaujian
+        },
+        distinct:['date'],
+    });
+
+    return dates;
+}
+
 export async function getUjianBySemester(idSemester,tipe){
     const allUjian = await db.exam.findMany({
         where:{
@@ -45,21 +60,6 @@ export async function getUjianBySemester(idSemester,tipe){
     return allUjian;
 }
 
-export async function getFood(date,tipe,semester){
-    const allUjian = await db.$queryRaw`
-        SELECT
-            SUM("ExamRoomLec"."lunch") as "lunch",
-            SUM("ExamRoomLec"."snack") as "snack"
-        FROM
-            "Exam" INNER JOIN "ExamRoomLec"
-        ON
-            "Exam"."id" = "ExamRoomLec"."idUjian"
-        WHERE
-            "Exam"."date" = ${date}::date AND "Exam"."tipe" = ${tipe} AND "Exam"."idSemester" = ${semester}
-    `;
-
-    return allUjian;
-}
 
 // "Exam"."date" = ${date}::date AND "Exam"."tipe" = ${tipe} AND "Exam"."idSemester" = ${semester}
 
@@ -77,42 +77,6 @@ export async function getUjianRuanganDosen(){
         
     });
 
-    return allUjian;
-}
-
-export async function getUjianRuanganDosenGroupByDate(idSemester,tipe){
-    // const allUjian = await db.$queryRaw`
-    // SELECT *
-    // FROM "Exam"
-    // INNER JOIN "ExamRoomLec"
-    // ON "ExamRoomLec"."idUjian" = "Exam"."id"
-    // INNER JOIN "Classroom"
-    // ON "ExamRoomLec"."idRuangan" = "Classroom"."id"
-    // ORDER BY "Exam"."date" ASC
-    // `;
-
-    const allUjian = await db.exam.findMany({
-        where:{
-            idSemester:String(idSemester),
-            tipe:String(tipe),
-        },
-        orderBy:[
-            {
-                date:'asc',
-            }
-        ],
-        include:{
-            semester:true,
-            matkul:true,
-            ujian:{
-                include:{
-                    dosen:true,
-                    ruangan:true,
-                }
-            }
-        }
-    });
-    
     return allUjian;
 }
 
@@ -339,6 +303,48 @@ export async function addPengawasUjian(data){
     }
     catch(err){
         console.error("Error menambahkan pengguna ",err);
+        return false;
+    }
+}
+
+export async function getUjianByDateWaktu(date,waktuMulai,waktuSelesai,idUjian){
+    try{
+        const ujian = await db.exam.findMany({
+            where:{
+                OR:[
+                    {
+                        date:date,
+                        mulai:{
+                            gte:waktuMulai,
+                            lte:waktuSelesai, 
+                        },
+                        selesai:{
+                            gte:waktuMulai,
+                            lte:waktuSelesai
+                        }
+                    },{
+                        date:date,
+                        mulai:{
+                            lte:waktuMulai
+                        },
+                        selesai:{
+                            gte:waktuSelesai
+                        }
+                    }
+                ],
+                id:{
+                    not:idUjian
+                }
+            },
+            include:{
+                ujian:true
+            }
+        });
+
+        return ujian
+    }
+    catch(err){
+        console.error("Error Mengambil Data");
         return false;
     }
 }

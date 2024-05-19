@@ -8,15 +8,20 @@ import ModalSuccessAdd from "../modal/SuccessAdd";
 import { getSemester } from "@/app/actions/semester";
 import { addUjian } from "@/app/actions/ujian";
 import { getMatkulUjianBySemester } from "@/app/actions/matkulujian";
+import ToastErrorInput from "../toast/ErrorInput";
+import { UjianSchema } from "@/modules/schema";
+import LoadingPage from "../LoadingPage";
 
 export default function AddUjian({props}){
     const [isLoading,setLoading] = useState(true);
     const [semester,setSemester] = useState(new Object);
     const [matkul,setMatkul] = useState(new Object);
-    const [selectedMatkul,setSelectedMatkul] = useState();
+    const [selectedMatkul,setSelectedMatkul] = useState([]);
     const [modal,setModal] = useState(false);
     const [toast,setToast] = useState(false);
     const [selectedSemester, setSelectedSemester] = useState(props.semester.id);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
     const ref = useRef<HTMLFormElement>(null);
     const router = useRouter();
 
@@ -25,31 +30,50 @@ export default function AddUjian({props}){
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
 
     const backToHomepage = () => router.push("/admin/ujian");
 
     async function add(formData:FormData){
-        const waktumulai = new Date(formData.get("tanggal")?.toString()+" "+formData.get("waktumulai")?.toString()+":00");
-        const waktuselesai = new Date(formData.get("tanggal")?.toString()+" "+formData.get("waktuselesai")?.toString()+":00");
-        const date = new Date(formData.get("tanggal")?.toString()+"").toISOString();
-        
         let arr = new Array;
-
         for(let i = 0;i<selectedMatkul.length;i++){
             let data = new Object;
             data.id = selectedMatkul[i];
             arr.push(data);
         }
 
-        const response = await addUjian(formData,waktumulai,waktuselesai,arr);
-        //const response = true;
-        if(response==true){
-            ref.current?.reset();
-            openModal();
-            openToast();
+        const data = {
+            semester: formData.get("semester"),
+            tanggal: formData.get("tanggal"),
+            mulai: formData.get("waktumulai")+":00",
+            selesai: formData.get("waktuselesai")+":00",
+            tipeujian: formData.get("tipeujian"),
+            metodeujian: formData.get("metodeujian"),
+            shift: Number(formData.get("shift")),
+            matkul: arr
+        }
+
+        const validation = UjianSchema.safeParse(data);
+
+        if(validation.success){
+            const waktumulai = new Date(formData.get("tanggal")?.toString()+" "+formData.get("waktumulai")?.toString()+":00");
+            const waktuselesai = new Date(formData.get("tanggal")?.toString()+" "+formData.get("waktuselesai")?.toString()+":00");
+            const date = new Date(formData.get("tanggal")?.toString()+"").toISOString();
+            
+            const response = await addUjian(formData,waktumulai,waktuselesai,arr);
+            if(response==true){
+                ref.current?.reset();
+                openModal();
+                openToast();
+            }
+            else{
+                alert("Gagal Menambahkan Pengguna");
+            }
         }
         else{
-            alert("Gagal Menambahkan Pengguna");
+            setError(validation.error.issues);
+            openToastError();
         }
     }
 
@@ -99,21 +123,21 @@ export default function AddUjian({props}){
     }
 
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Tambah Ujian</h1>
+                    <h3><strong>Tambah Ujian</strong></h3>
                 </div>
                 <form id="form" ref={ref} action={add}>
                     <div className="d-flex flex-row w-100">
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Semester</label>
-                                <select className="form-control" name="semester" onChange={handleChangeSemester}>
+                                <select className="form-control" name="semester" onChange={handleChangeSemester} style={{border:"2px solid black"}}>
                                     {semester.map((sem)=>(
                                         sem.id==selectedSemester ?
                                             <option value={sem.id.toString()} selected>{sem.semester}</option>
@@ -124,37 +148,37 @@ export default function AddUjian({props}){
                             </div>
                             <div className="form-group w-50">
                                 <label>Tanggal</label>
-                                <input className="form-control" name="tanggal" type="date"/>
+                                <input className="form-control" name="tanggal" type="date" style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Waktu Mulai</label>
-                                <input className="form-control" name="waktumulai" type="time"/>
+                                <input className="form-control" name="waktumulai" type="time" style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Waktu Selesai</label>
-                                <input className="form-control" name="waktuselesai" type="time"/>
+                                <input className="form-control" name="waktuselesai" type="time" style={{border:"2px solid black"}}/>
                             </div>
                         </div>
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Tipe Ujian</label>
-                                <select className="form-control" name="tipeujian">
+                                <select className="form-control" name="tipeujian" style={{border:"2px solid black"}}>
                                     <option value="UTS">UTS</option>
-                                    <option value="UTS">UAS</option>
+                                    <option value="UAS">UAS</option>
                                 </select>
                             </div>
                             <div className="form-group w-50">
                                 <label>Metode Ujian</label>
-                                <select className="form-control" name="metodeujian">
-                                    <option value="Daring">Daring</option>
+                                <select className="form-control" name="metodeujian" style={{border:"2px solid black"}}>
                                     <option value="Luring">Luring</option>
+                                    <option value="Daring">Daring</option>
                                     <option value="Proyek">Proyek</option>
                                     <option value="Presentasi">Presentasi</option>
                                 </select>
                             </div>
                             <div className="form-group w-50">
                                 <label>Shift</label>
-                                <select className="form-control" name="shift">
+                                <select className="form-control" name="shift" style={{border:"2px solid black"}}>
                                     <option value="0">Tidak Ada Shift</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
@@ -163,7 +187,7 @@ export default function AddUjian({props}){
                             </div>
                             <div className="form-group w-50">
                                 <label>Mata Kuliah</label>
-                                <Select options={matkul} placeholder="Pilih Mata Kuliah" isMulti isSearchable isClearable name="matakuliah" onChange={handleChangeMatkul}/>
+                                <Select options={matkul} placeholder="Pilih Mata Kuliah" isMulti isSearchable isClearable name="matakuliah" onChange={handleChangeMatkul} styles={{control: (baseStyles, state) => ({...baseStyles,border: state.isFocused ? '2px solid black' : '2px solid black',}),}}/>
                             </div>
                         </div>
                     </div>
@@ -173,6 +197,7 @@ export default function AddUjian({props}){
 
             <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Ujian"}/>
             <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Ujian"}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

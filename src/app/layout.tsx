@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className='h-100'>
-      <body className="h-100">
+      <body className="h-100" style={{background:"#D8D9DA"}}>
         <Providers>{children}</Providers>
       </body>
     </html>

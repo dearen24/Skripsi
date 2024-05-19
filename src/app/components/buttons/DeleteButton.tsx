@@ -119,13 +119,15 @@ export function DeleteButton(props){
         else if(props.page=="Ujian"){
             const response = await deleteUjian(props.idUjian);
             for(let i = 0;i<props.ujian.length;i++){
-                if(props.ujian[i]!=undefined){
-                    if(props.ujian[i].id==props.idUjian){
-                        props.ujian.splice(i,1);
+                for(let j = 0;j<props.ujian[i].length;j++){
+                    if(props.ujian[i][j]!=undefined){
+                        if(props.ujian[i][j].id==props.idUjian){
+                            props.ujian[i].splice(j,1);
+                        }
                     }
                 }
             }
-            if(response==true){
+            if(true){
                 props.setUjian(props.ujian);
             }
             else{
@@ -184,7 +186,7 @@ export function DeleteButton(props){
     
     return(
         <>
-            <button className="btn btn-outline-danger mx-1" id="livaToastBtn" onClick={openModal}>
+            <button className="btn btn-danger mx-1" id="livaToastBtn" onClick={openModal} style={{border:"2px solid black"}}>
                 <Image src="/trash-fill.svg" alt="Delete" width={20} height={20}/>
             </button>
 

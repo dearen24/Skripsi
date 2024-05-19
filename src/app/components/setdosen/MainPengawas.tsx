@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import {addPengawasUjian, getUjian, getUjianBySemester} from "../../actions/ujian"
 import LoadingPengguna from "../../admin/dosen/loading";
-import { Form } from "react-bootstrap";
+import { Card, CardBody, Col, Form, Row } from "react-bootstrap";
 import { getUser } from "@/app/actions/user";
 import Image from "next/image";
 import { getSemester } from "@/app/actions/semester";
 import ItemPengawas from "./ItemPengawas";
 import ToastSuccessEdit from "../toast/SuccessEdit";
+import LoadingPage from "../LoadingPage";
 
 export default function MainPengawas({props}){
     const [isLoading,setLoading] = useState(true);
@@ -145,7 +146,6 @@ export default function MainPengawas({props}){
     const handleChangeSemester = async (e) => {
         const dataTemp = {...selectedData};
         dataTemp.semester = e.target.value;
-        setSelectedData(dataTemp);
         const dosenTemp = await getUser();
         const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
 
@@ -199,6 +199,11 @@ export default function MainPengawas({props}){
             }
         }
 
+        if(ujianDate.length!=0){
+            dataTemp.date = ujianDate[0].toISOString();
+        }
+        
+        setSelectedData(dataTemp);
         setDate(ujianDate);
         setDosen(dosenTemp);
         setUjian(ujianTemp);
@@ -207,7 +212,6 @@ export default function MainPengawas({props}){
     const handleChangeTipe = async (e) => {
         const dataTemp = {...selectedData};
         dataTemp.tipe = e.target.value;
-        setSelectedData(dataTemp);
         const dosenTemp = await getUser();
         const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
 
@@ -261,6 +265,11 @@ export default function MainPengawas({props}){
             }
         }
 
+        if(ujianDate.length!=0){
+            dataTemp.date = ujianDate[0].toISOString();
+        }
+
+        setSelectedData(dataTemp);
         setDate(ujianDate);
         setDosen(dosenTemp);
         setUjian(ujianTemp);
@@ -272,85 +281,156 @@ export default function MainPengawas({props}){
         setSelectedData(tempData);
     }
 
-    console.log(ujian);
-
     if(isLoading){
-        return <LoadingPengguna/>
+        return <LoadingPage/>
     }
-    
-    return(
-        <>
-            <div className="table-responsive w-100">
-                <h1>Pengawas Ujian</h1>
-                <div className="table-wrapper">
-                    <div className="d-flex flex-row">
-                        <div className="dropdown">
-                            <Form.Select onChange={handleChangeSemester} aria-label="Semester">
-                                {semester.map((sem)=>(
-                                    sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
-                                ))}
-                            </Form.Select>
-                        </div>
-                        <div className="dropdown mx-1">
-                            <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian">
-                                <option selected>UTS</option>
-                                <option>UAS</option>
-                            </Form.Select>
-                        </div>
-                        <div className="">
-                            <Form.Select onChange={handleChangeDate}>
-                                {date.map((d)=>(
-                                    d.toISOString()==selectedData.date ?
-                                    <option value={d.toISOString()} selected>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
-                                    :
-                                    <option value={d.toISOString()}>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
-                                ))}
-                            </Form.Select>
-                        </div>
-                        <div>
-                            <button className="btn btn-primary" onClick={onClickEdit}>Edit</button>
-                        </div>
-                    </div>
-                    <table className="table table-hover align-middle">
-                        <thead className="table-dark">
-                            <tr className="">    
-                                <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Tanggal</th>						
-                                <th className="text-center">Waktu Mulai</th>
-                                <th className="text-center">Waktu Selesai</th>
-                                <th className="text-center">Tipe Ujian</th>
-                                <th className="text-center">Shift</th>
-                                <th className="text-center">Ruangan</th>
-                                <th className="text-center">Mata Kuliah</th>
-                                <th className="text-center">Dosen Pengajar</th>
-                                <th className="text-center">Pengawas</th>
-                                <th className="text-center" style={{borderTopRightRadius:'6px'}}>Tambah Pengawas</th>
-                            </tr>
-                        </thead>
-                        {/* {ujian.map((u,indexUjian)=>(
-                            u.ruangandosen.map((ruangandosen,indexRuanganDosen)=>(
-                                u.semester.id==selectedData.semester&&u.tipe==selectedData.tipe ? 
-                                <ItemPengawas key={indexUjian+""+indexRuanganDosen} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={false}/>
-                                :
-                                <ItemPengawas key={indexUjian+""+indexRuanganDosen} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={true}/>
-                            ))
-                        ))} */}
-                        {ujian.map((u,indexUjian)=>(
-                            u.date.toISOString()==selectedData.date ?
-                            u.ruangandosen.map((ruangandosen,indexRuanganDosen)=>(
-                                <ItemPengawas key={u.id+""+ruangandosen.id} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={false}/>
-                            ))
-                            :
-                            null
-                        ))}
-                    </table>
-                </div> 
-                <button type="submit" className="btn btn-warning w-100 my-2" onClick={edit} hidden={hiddenAndDisabled}>
-                    <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
-                    Simpan Perubahan
-                </button> 
-            </div>
 
+    return(
+        <div className="d-flex flex-column w-100 h-100">
+            <div className="upper mx-1">
+                <h3><strong>Pengawas Ujian</strong></h3>
+            </div>
+            <div className="d-flex flex-row mb-1">
+                <div className="dropdown mx-1">
+                    <Form.Select onChange={handleChangeSemester} aria-label="Semester" style={{border:"2px solid black"}}>
+                        {semester.map((sem)=>(
+                        sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
+                    ))}
+                    </Form.Select>
+                </div>
+                <div className="dropdown">
+                    <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian" style={{border:"2px solid black"}}>
+                        <option selected>UTS</option>
+                        <option>UAS</option>
+                    </Form.Select>
+                </div>
+                <div className="mx-1">
+                    <Form.Select onChange={handleChangeDate} style={{border:"2px solid black"}}>
+                        {date.map((d)=>(
+                            d.toISOString()==selectedData.date ?
+                            <option value={d.toISOString()} selected>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+                            :
+                            <option value={d.toISOString()}>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+                        ))}
+                    </Form.Select>
+                </div>
+                <div>
+                    <button className="btn" onClick={onClickEdit} style={{backgroundColor:"#272829", color:"white"}}>Edit</button>
+                </div>
+            </div>
+            <div className="content mx-1">
+                <Card style={{backgroundColor:"#272829",color:"white"}}>
+                    <CardBody>
+                        <Row className="text-center">
+                            <Col>
+                                <strong>Waktu</strong>
+                            </Col>
+                            <Col>
+                                <strong>Metode</strong>
+                            </Col>
+                            <Col>
+                                <strong>Shift</strong>
+                            </Col>
+                            <Col>
+                                <strong>Ruangan</strong>
+                            </Col>
+                            <Col>
+                                <strong>Mata Kuliah</strong>
+                            </Col>
+                            <Col>
+                                <strong>Dosen Pengajar</strong>
+                            </Col>
+                            <Col>
+                                <strong>Pengawas</strong>
+                            </Col>
+                            <Col>
+                                <strong>Tambah Pengawas</strong>
+                            </Col>
+                        </Row>
+                    </CardBody>
+                </Card>
+                {ujian.map((u,indexUjian)=>(
+                    u.date.toISOString()==selectedData.date ?
+                    u.ruangandosen.map((ruangandosen,indexRuanganDosen)=>(
+                        <ItemPengawas key={u.id+""+ruangandosen.id} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={false}/>
+                    ))
+                    :
+                    null
+                ))}
+            </div>
+            <button type="submit" className="btn btn-warning w-100 my-2" onClick={edit} hidden={hiddenAndDisabled}>
+                <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
+                Simpan Perubahan
+            </button> 
             <ToastSuccessEdit toast={toast} closeToast={closeToast} />
-        </>
+        </div>
     )
+    
+    // return(
+    //     <>
+    //         <div className="table-responsive w-100">
+    //             <h1>Pengawas Ujian</h1>
+    //             <div className="table-wrapper">
+    //                 <div className="d-flex flex-row">
+    //                     <div className="dropdown">
+    //                         <Form.Select onChange={handleChangeSemester} aria-label="Semester">
+    //                             {semester.map((sem)=>(
+    //                                 sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
+    //                             ))}
+    //                         </Form.Select>
+    //                     </div>
+    //                     <div className="dropdown mx-1">
+    //                         <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian">
+    //                             <option selected>UTS</option>
+    //                             <option>UAS</option>
+    //                         </Form.Select>
+    //                     </div>
+    //                     <div className="">
+    //                         <Form.Select onChange={handleChangeDate}>
+    //                             {date.map((d)=>(
+    //                                 d.toISOString()==selectedData.date ?
+    //                                 <option value={d.toISOString()} selected>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+    //                                 :
+    //                                 <option value={d.toISOString()}>{d.toDateString().split(" ")[0]+", "+d.toDateString().split(" ")[2]+" "+d.toDateString().split(" ")[1]+" "+d.toDateString().split(" ")[3]}</option>
+    //                             ))}
+    //                         </Form.Select>
+    //                     </div>
+    //                     <div>
+    //                         <button className="btn btn-primary" onClick={onClickEdit}>Edit</button>
+    //                     </div>
+    //                 </div>
+    //                 <table className="table table-hover align-middle">
+    //                     <thead className="table-dark">
+    //                         <tr className="">    
+    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Tanggal</th>						
+    //                             <th className="text-center">Waktu Mulai</th>
+    //                             <th className="text-center">Waktu Selesai</th>
+    //                             <th className="text-center">Tipe Ujian</th>
+    //                             <th className="text-center">Shift</th>
+    //                             <th className="text-center">Ruangan</th>
+    //                             <th className="text-center">Mata Kuliah</th>
+    //                             <th className="text-center">Dosen Pengajar</th>
+    //                             <th className="text-center">Pengawas</th>
+    //                             <th className="text-center" style={{borderTopRightRadius:'6px'}}>Tambah Pengawas</th>
+    //                         </tr>
+    //                     </thead>
+    //                     {ujian.map((u,indexUjian)=>(
+    //                         u.date.toISOString()==selectedData.date ?
+    //                         u.ruangandosen.map((ruangandosen,indexRuanganDosen)=>(
+    //                             <ItemPengawas key={u.id+""+ruangandosen.id} ujian={u} ruangandosen={ruangandosen} indexUjian={indexUjian} indexRuanganDosen={indexRuanganDosen} dosen={dosen} handleChange={handleChangePengawas} hiddenAndDisabled={hiddenAndDisabled} hidden={false}/>
+    //                         ))
+    //                         :
+    //                         null
+    //                     ))}
+    //                 </table>
+    //             </div> 
+    //             <button type="submit" className="btn btn-warning w-100 my-2" onClick={edit} hidden={hiddenAndDisabled}>
+    //                 <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
+    //                 Simpan Perubahan
+    //             </button> 
+    //         </div>
+
+    //         <ToastSuccessEdit toast={toast} closeToast={closeToast} />
+    //     </>
+    // )
 }

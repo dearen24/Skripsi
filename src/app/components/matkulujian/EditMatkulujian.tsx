@@ -7,6 +7,9 @@ import { getMatkul } from "@/app/actions/matkul";
 import { editMatkulujian, getMatkulujianById } from "@/app/actions/matkulujian";
 import Select from "react-select";
 import { getSemester } from "@/app/actions/semester";
+import LoadingPage from "../LoadingPage";
+import ToastErrorInput from "../toast/ErrorInput";
+import { MatkulUjianSchema } from "@/modules/schema";
 
 export default function EditMatkulUjian({params}){
     const [isLoading,setLoading] = useState(true);
@@ -17,13 +20,16 @@ export default function EditMatkulUjian({params}){
     const [dataSemester,setSemester] = useState();
     const [dataMatkul,setMatkul] = useState();
     const [toast,setToast] = useState(false);
+    const [toastError,setToastError] = useState(false);
+    const [error,setError] = useState([]);
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
+    const closeToastError = () => setToastError(false);
+    const openToastError = () => setToastError(true);
 
     async function edit(formData:FormData){
         let arr = new Array;
-
         for(let i = 0;i<selectedDosen.length;i++){
             let data = new Object;
             data.id = selectedDosen[i];
@@ -32,14 +38,32 @@ export default function EditMatkulUjian({params}){
             }
             arr.push(data);
         }
+
+        const data = {
+            semester: formData.get("semester"),
+            jumlahPeserta: Number(formData.get("jumlahpeserta")),
+            matkul: formData.get("matkul"),
+            dosenPengajar: arr,
+        }
+
+        const validation = MatkulUjianSchema.safeParse(data);
         
-        const response = await editMatkulujian(formData,params,arr);
-        if(response==true){
-            openToast();   
+        if(validation.success){
+            const response = await editMatkulujian(formData,params,arr);
+            if(response==true){
+                openToast();   
+            }
+            else{
+                alert("Gagal Mengubah Pengguna");
+            }
         }
         else{
-            alert("Gagal Mengubah Pengguna");
+            setError(validation.error.issues);
+            openToastError();
         }
+        
+        
+        
     }
 
     useEffect(() => {
@@ -96,21 +120,21 @@ export default function EditMatkulUjian({params}){
     }
 
     if(isLoading){
-        return <p>Loading...</p>
+        return <LoadingPage/>
     }
 
     return(
         <>  
-            <div>
+            <div className="mx-1">
                 <div>
-                    <h1>Ubah Mata Kuliah Ujian</h1>
+                    <h3><strong>Ubah Mata Kuliah Ujian</strong></h3>
                 </div>
                 <form id="form" action={edit}>
                     <div className="d-flex flex-row w-100">
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Semester</label>
-                                <select className="form-control" name="semester">
+                                <select className="form-control" name="semester" style={{border:"2px solid black"}}>
                                     {dataSemester.map((sem)=>(
                                         sem.semester==dataMatkulUjian.semester.semester ? <option value={sem.id.toString()} selected>{sem.semester}</option> : <option value={sem.id.toString()}>{sem.semester}</option>
                                         ))}
@@ -118,21 +142,21 @@ export default function EditMatkulUjian({params}){
                             </div>
                             <div className="form-group w-50">
                                 <label>Mata Kuliah</label>
-                                <Select options={dataMatkul} placeholder="Pilih Mata Kuliah" isSearchable name="matkul" defaultValue={selectedMatkul}/>
+                                <Select className="border black" options={dataMatkul} placeholder="Pilih Mata Kuliah" isSearchable name="matkul" defaultValue={selectedMatkul} styles={{control: (baseStyles, state) => ({...baseStyles,border: state.isFocused ? '2px solid black' : '2px solid black',}),}}/>
                             </div>
                         </div>
                         <div className="w-50">
                             <div className="form-group w-50">
                                 <label>Jumlah Peserta</label>
-                                <input className="form-control" type="number" name="jumlahpeserta" placeholder="Jumlah Peserta" defaultValue={dataMatkulUjian.peserta}/>
+                                <input className="form-control" type="number" name="jumlahpeserta" placeholder="Jumlah Peserta" defaultValue={dataMatkulUjian.peserta} style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Dosen Pengajar</label>
-                                <Select options={dataDosen} placeholder="Pilih Dosen Pengajar"  isMulti isSearchable isClearable name="dosenpengajar" onChange={handleChangeDosen} defaultValue={selectedDosen}/>
+                                <Select options={dataDosen} placeholder="Pilih Dosen Pengajar"  isMulti isSearchable isClearable name="dosenpengajar" onChange={handleChangeDosen} defaultValue={selectedDosen} styles={{control: (baseStyles, state) => ({...baseStyles,border: state.isFocused ? '2px solid black' : '2px solid black',}),}}/>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-warning w-100 my-2">
+                    <button type="submit" className="btn btn-warning w-100 my-2" style={{border:"2px solid black"}}>
                         <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
                         Simpan Perubahan
                     </button>
@@ -140,6 +164,7 @@ export default function EditMatkulUjian({params}){
             </div>
 
             <ToastSuccessEdit toast={toast} closeToast={closeToast}/>
+            <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>
     )
 }

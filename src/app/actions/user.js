@@ -24,6 +24,21 @@ export async function getUserById(idUser){
     return user;
 }
 
+export async function getUserAdmin(){
+    const user = await db.user.findFirst({
+        where:{
+            role:{
+                nama:"Admin",
+            }
+        },
+        include:{
+            role:true,
+        }
+    });
+
+    return user;
+}
+
 export async function deleteUser(idUser){
     try{
         const user = await db.user.delete({

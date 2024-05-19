@@ -19,6 +19,7 @@ model User {
   idRole           String
   dosenMengajar    ExamSubject[]
   mengawas         ExamRoomLec[]
+  rekapMengawas    RekapMengawas[]
 }
 
 model ExamSubject {
@@ -53,6 +54,7 @@ model Semester {
   ujian               Exam[]
   tukarjadwal         HistoryTukar[]
   konsumsinonpengawas KonsumsiNonPengawas[]
+  rekapmengawas       RekapMengawas[]
 }
 
 model Subject {
@@ -64,11 +66,14 @@ model Subject {
 }
 
 model Rules {
-  id          String @id @default(uuid())
-  sebelum12   Boolean
-  melewati12  Boolean
-  setelah12   Boolean
-  konsumsi    String
+  id                String @id @default(uuid())
+  delapanSepuluh    Boolean
+  sepuluhDuaBelas   Boolean
+  sebelasTigaBelas  Boolean
+  duaBelasDua       Boolean
+  duaEmpat          Boolean
+  snack             Int
+  lunch             Int
 }
 
 model Exam {
@@ -116,4 +121,16 @@ model KonsumsiNonPengawas {
   snack       Int
   lunch       Int
   description String
+}
+
+model RekapMengawas {
+  id              String    @id @default(uuid())
+  idSemester      String
+  idDosen         String
+  dosen           User     @relation(fields: [idDosen], references: [id])
+  semester        Semester @relation(fields: [idSemester], references: [id])
+  kuota           Int
+  sisaSebelumnya  Int
+  jumlahMengawas  Int
+  sisa            Int
 }

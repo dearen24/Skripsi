@@ -1,9 +1,11 @@
 {
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/not-found": "app/not-found.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/admin/jabatan/page": "app/admin/jabatan/page.js",
-  "/admin/matkulujian/page": "app/admin/matkulujian/page.js",
-  "/admin/ujian/page": "app/admin/ujian/page.js",
-  "/admin/ujian/add/page": "app/admin/ujian/add/page.js",
-  "/admin/ujian/[id]/page": "app/admin/ujian/[id]/page.js"
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/admin/pertukarandosen/add/page": "app/admin/pertukarandosen/add/page.js",
+  "/admin/rekapmengawas/page": "app/admin/rekapmengawas/page.js",
+  "/admin/konsumsi/page": "app/admin/konsumsi/page.js",
+  "/admin/aturpengawas/page": "app/admin/aturpengawas/page.js",
+  "/admin/pertukarandosen/page": "app/admin/pertukarandosen/page.js",
+  "/admin/aturankonsumsi/page": "app/admin/aturankonsumsi/page.js"
 }
