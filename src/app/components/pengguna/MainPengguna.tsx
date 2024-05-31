@@ -19,7 +19,6 @@ export default function MainPengguna(){
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
     const [displayedPengguna, setDisplayedPengguna] = useState(new Object);
-    const spinner = [1,1,1];
     const router = useRouter();
 
     const closeToastTambah = () => setToastTambah(false);
@@ -92,22 +91,22 @@ export default function MainPengguna(){
                 <Card style={{backgroundColor:"#272829",color:"white"}}>
                     <CardBody>
                         <Row className="text-center">
-                            <Col>
+                            <Col md="2">
                                 <strong>Nama</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>NIK</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>Email</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>Jabatan</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>Kuota Mengawas</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>Action</strong>
                             </Col>
                         </Row>

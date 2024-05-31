@@ -216,6 +216,7 @@ export default function CekJumlahKonsumsi({props}){
                         <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                     <div className="">
@@ -231,12 +232,12 @@ export default function CekJumlahKonsumsi({props}){
                 </div>
                 <div className="d-flex flex-row w-100 justify-content-left px-1">
                     <div className="form-group d-flex flex-row align-items-center">
-                        <label style={{paddingRight:"10px"}}>Snack</label>
+                        <label style={{paddingRight:"10px"}}><strong>Snack</strong></label>
                         <input className="form-control" value={totalSnack.toString()} style={{border:"2px solid black"}}/>
                         {/* {food[0].snack==null&&foodNonPengawas==null ? <input className="form-control" readOnly value={0}/> : <input className="form-control" readOnly value={(food[0].snack+foodNonPengawas.snack).toString()}/> } */}
                     </div>
                     <div className="form-group d-flex flex-row align-items-center">
-                        <label className="px-3">Lunch</label>
+                        <label className="px-3"><strong>Lunch</strong></label>
                         <input className="form-control" value={totalLunch.toString()} style={{border:"2px solid black"}}/>
                         {/* {food[0].lunch==null ? <input className="form-control" readOnly value={0}/> : <input className="form-control" readOnly value={food[0].lunch.toString()}/> } */}
                     </div>

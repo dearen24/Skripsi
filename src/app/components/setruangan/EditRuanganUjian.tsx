@@ -4,7 +4,7 @@ import Image from "next/image";
 import ToastSuccessEdit from "../toast/SuccessEdit";
 import { editRuanganUjian, editUjian, getUjianByDateWaktu, getUjianById, getUjianByIdMany } from "@/app/actions/ujian";
 import { getSemester } from "@/app/actions/semester";
-import { getMatkul } from "@/app/actions/matkul";
+import { getMatkul, getMatkulBySemester } from "@/app/actions/matkul";
 import Select from "react-select";
 import { getRuangan } from "@/app/actions/ruangan";
 import LoadingPage from "../LoadingPage";
@@ -20,6 +20,8 @@ export default function EditRuanganUjian({params}){
     const [selectedRuangan,setSelectedRuangan] = useState(new Array);
     const [toast,setToast] = useState(false);
     const [rooms,setRooms] = useState([]);
+    const [totalKapasitas,setTotalKapasitas] = useState(0);
+    const [totalPeserta,setTotalPeserta] = useState(0);
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
@@ -70,7 +72,7 @@ export default function EditRuanganUjian({params}){
                 openToast(); 
             }
             else{
-                alert("Gagal Mengubah Pengguna");
+                alert("Gagal Mengatur Ruangan Ujian");
             }
         }
         else{
@@ -85,7 +87,7 @@ export default function EditRuanganUjian({params}){
             try {
                 const dataUjian = await getUjianById(params);
                 const dataRuangan = await getRuangan();
-                const dataMatkul = await getMatkul();
+                const dataMatkul = await getMatkulBySemester(dataUjian?.idSemester);
 
                 let arrMatkul = [];
                 let arrSelectedMatkul = [];
@@ -99,6 +101,9 @@ export default function EditRuanganUjian({params}){
                     for(let j = 0;j<dataUjian?.matkul.length;j++){
                         if(dataMatkul[i].id==dataUjian?.matkul[j].id){
                             arrSelectedMatkul.push(data);
+                            let currPeserta = totalPeserta;
+                            currPeserta += dataMatkul[i].matkulujian[0].peserta;
+                            setTotalPeserta(currPeserta);
                         }
                     }
                     arrMatkul.push(data);
@@ -111,8 +116,11 @@ export default function EditRuanganUjian({params}){
                     if(dataUjian?.ujian.length!=0){
                         for(let j = 0;j<dataUjian.ujian.length;j++){
                             if(dataRuangan[i].id==dataUjian.ujian[j].ruangan?.id){
-                                if(arrSelectedRuangan.some(ruangan=>ruangan.value==data.value)==false){
+                                if(arrSelectedRuangan.some(ruangan=>ruangan.value==data.value)==false){//kalo belom ada di selected baru masukin
                                     arrSelectedRuangan.push(data);
+                                    let currKapasitas = totalKapasitas;
+                                    currKapasitas += dataRuangan[i].kapasitas;
+                                    setTotalKapasitas(currKapasitas);
                                 }
                             }
                         }
@@ -134,6 +142,16 @@ export default function EditRuanganUjian({params}){
         }, []);
         
     const handleChangeRuangan = async (e) => {
+        let currKapasitas = 0;
+        const ruangan = await getRuangan();
+        for(let i = 0;i<ruangan.length;i++){
+            for(let j = 0;j<e.length;j++){
+                if(ruangan[i].id==e[j].value){
+                    currKapasitas += ruangan[i].kapasitas;
+                }
+            }
+        }
+        setTotalKapasitas(currKapasitas);
         setSelectedRuangan(e.map(x => x.value));
     }
 
@@ -165,6 +183,10 @@ export default function EditRuanganUjian({params}){
                             <div className="form-group w-50">
                                 <label>Waktu Selesai</label>
                                 <input className="form-control" name="waktuselesai" type="time" defaultValue={ujian.selesai.toTimeString().substring(0,5)} readOnly style={{border:"2px solid black"}}/>
+                            </div>
+                            <div className="form-group w-50 my-2">
+                                <label>Kapasitas Ruangan : <strong>{totalKapasitas}</strong></label>
+                                <label>Peserta Mata Kuliah : <strong>{totalPeserta}</strong></label>
                             </div>
                         </div>
                         <div className="w-50">

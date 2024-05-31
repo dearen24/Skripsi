@@ -39,15 +39,21 @@ export default function KonsumsiNonPengawas({props}){
         fetchData();
     }, []);
 
-    const onChangeSemester = (e) => {
+    const onChangeSemester = async (e) => {
         const tempData = {...selectedData};
         tempData.semester = e.target.value;
+        const konsumsiTemp = await getKonsumsiNonPengawas(e.target.value,tempData.tipe);
+
+        setKonsumsi(konsumsiTemp);
         setSelectedData(tempData);
     }
 
-    const onChangeTipe = (e) => {
+    const onChangeTipe = async (e) => {
         const tempData = {...selectedData};
         tempData.tipe = e.target.value;
+        const konsumsiTemp = await getKonsumsiNonPengawas(tempData.semester,e.target.value);
+
+        setKonsumsi(konsumsiTemp);
         setSelectedData(tempData);
     }
 
@@ -80,6 +86,7 @@ export default function KonsumsiNonPengawas({props}){
                         <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                 </div>

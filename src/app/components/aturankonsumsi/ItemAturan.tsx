@@ -1,7 +1,8 @@
 "use client"
 import { EditButton } from "../buttons/EditButton";
 import { DeleteButton } from "../buttons/DeleteButton";
-import { Card, CardBody, Col, Row } from "react-bootstrap";
+import { Button, Card, CardBody, Col, Row } from "react-bootstrap";
+import Image from "next/image";
 
 const ItemAturan = (aturan) => {
 
@@ -10,22 +11,59 @@ const ItemAturan = (aturan) => {
             <CardBody>
                 <Row className="text-center">
                     <Col className="align-content-center">
-                        <strong>{aturan.index}</strong>
+                        {aturan.rule.delapanSepuluh.toString()=="true"?
+                            <Button className="btn btn-sm btn-success" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/check-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        :
+                            <Button className="btn btn-sm btn-danger" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/x-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        }
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{aturan.rule.delapanSepuluh.toString()}</strong>
+                        {aturan.rule.sepuluhDuaBelas.toString()=="true"?
+                            <Button className="btn btn-sm btn-success" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/check-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        :
+                            <Button className="btn btn-sm btn-danger" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/x-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        }
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{aturan.rule.sepuluhDuaBelas.toString()}</strong>
+                        {aturan.rule.sebelasTigaBelas.toString()=="true"?
+                            <Button className="btn btn-sm btn-success" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/check-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        :
+                            <Button className="btn btn-sm btn-danger" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/x-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        }
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{aturan.rule.sebelasTigaBelas.toString()}</strong>
+                        {aturan.rule.duaBelasDua.toString()=="true"?
+                            <Button className="btn btn-sm btn-success" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/check-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        :
+                            <Button className="btn btn-sm btn-danger" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/x-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        }
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{aturan.rule.duaBelasDua.toString()}</strong>
-                    </Col>
-                    <Col className="align-content-center">
-                        <strong>{aturan.rule.duaEmpat.toString()}</strong>
+                        {aturan.rule.duaEmpat.toString()=="true"?
+                            <Button className="btn btn-sm btn-success" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/check-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        :
+                            <Button className="btn btn-sm btn-danger" style={{border:"2px solid black", borderRadius:"50px"}}>
+                                <Image src="/x-circle-fill.svg" alt="True" height={20} width={20}/>
+                            </Button>
+                        }
                     </Col>
                     <Col className="align-content-center">
                         <strong>{aturan.rule.snack.toString()}</strong>
@@ -33,7 +71,7 @@ const ItemAturan = (aturan) => {
                     <Col className="align-content-center">
                         <strong>{aturan.rule.lunch.toString()}</strong>
                     </Col>
-                    <Col className="align-content-center">
+                    <Col className="align-content-center" md="2">
                         <div className="d-flex flex-row justify-content-center">
                             <EditButton page={"Aturan Konsumsi"} idAturan={aturan.rule.id}/>
                             <DeleteButton page={"Aturan Konsumsi"} idAturan={aturan.rule.id} aturan={aturan.aturan} setAturan={aturan.setAturan}/>

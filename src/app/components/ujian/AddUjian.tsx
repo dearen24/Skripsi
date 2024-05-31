@@ -89,7 +89,7 @@ export default function AddUjian({props}){
                 for(let i = 0;i<dataMatkul.length;i++){
                     let data = new Object;
                     data.value = dataMatkul[i].matkul.id;
-                    data.label = dataMatkul[i].matkul.nama;
+                    data.label = dataMatkul[i].matkul.kode+" - "+dataMatkul[i].matkul.nama;
                     arrMatkul.push(data);
                 }
 
@@ -115,7 +115,7 @@ export default function AddUjian({props}){
         for(let i = 0;i<dataMatkul.length;i++){
             let data = new Object;
             data.value = dataMatkul[i].matkul.id;
-            data.label = dataMatkul[i].matkul.nama;
+            data.label = dataMatkul[i].matkul.kode+" - "+dataMatkul[i].matkul.nama;
             arrMatkul.push(data);
         }
 
@@ -152,11 +152,11 @@ export default function AddUjian({props}){
                             </div>
                             <div className="form-group w-50">
                                 <label>Waktu Mulai</label>
-                                <input className="form-control" name="waktumulai" type="time" style={{border:"2px solid black"}}/>
+                                <input className="form-control" name="waktumulai" type="time" min={"08:00"} max={"16:00"} step={3600} style={{border:"2px solid black"}}/>
                             </div>
                             <div className="form-group w-50">
                                 <label>Waktu Selesai</label>
-                                <input className="form-control" name="waktuselesai" type="time" style={{border:"2px solid black"}}/>
+                                <input className="form-control" name="waktuselesai" type="time" step={3600} min={"08:00"} max={"16:00"} style={{border:"2px solid black"}}/>
                             </div>
                         </div>
                         <div className="w-50">
@@ -165,13 +165,13 @@ export default function AddUjian({props}){
                                 <select className="form-control" name="tipeujian" style={{border:"2px solid black"}}>
                                     <option value="UTS">UTS</option>
                                     <option value="UAS">UAS</option>
+                                    <option value="Pendek">Pendek</option>
                                 </select>
                             </div>
                             <div className="form-group w-50">
                                 <label>Metode Ujian</label>
                                 <select className="form-control" name="metodeujian" style={{border:"2px solid black"}}>
                                     <option value="Luring">Luring</option>
-                                    <option value="Daring">Daring</option>
                                     <option value="Proyek">Proyek</option>
                                     <option value="Presentasi">Presentasi</option>
                                 </select>

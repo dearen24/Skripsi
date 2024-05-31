@@ -28,7 +28,7 @@ const ItemPertukaranDosenAdmin = (props) => {
     const openToastReject = () => setToastReject(true);
 
     const onAcceptPertukaran = async () => {
-        const status = await acceptPertukaranAdmin(props.item.Dosen1.id,props.item.Dosen2.id);
+        const status = await acceptPertukaranAdmin(props.item.pertukaran.id);
         const response = await tukarJadwal(props.item.Dosen1.id,props.item.Dosen1.idDosen,props.item.Dosen2.id,props.item.Dosen2.idDosen);
         if(response&&status){
             setStatusAdmin("Disetujui");
@@ -38,7 +38,7 @@ const ItemPertukaranDosenAdmin = (props) => {
     }
 
     const onRejectPertukaran = async () => {
-        const response = await rejectPertukaranAdmin(props.item.Dosen1.id,props.item.Dosen2.id);
+        const response = await rejectPertukaranAdmin(props.item.pertukaran.id);
         if(response==true){
             setStatusAdmin("Ditolak");
             closeModalReject();
@@ -50,121 +50,49 @@ const ItemPertukaranDosenAdmin = (props) => {
         <Card className="my-1" style={{borderRadius:"10px",border:"2px solid black"}}>
             <CardBody>
                 <Row className="text-end">
-                    <Col>
-                        <Row>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-end">
-                                    <span>Tanggal</span>
-                                    <span>Waktu</span>
-                                </div>
-                            </Col>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-start">
-                                    <span>: {props.item.Dosen1.ujian.date.toDateString().split(" ")[0]+", "+props.item.Dosen1.ujian.date.toDateString().split(" ")[2]+" "+props.item.Dosen1.ujian.date.toDateString().split(" ")[1]+" "+props.item.Dosen1.ujian.date.toDateString().split(" ")[3]}</span>
-                                    <span>: {props.item.Dosen1.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+props.item.Dosen1.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</span>
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-end">
-                                    <span>Mata Kuliah</span>
-                                    <span>Ruangan</span>
-                                    <span>Dosen</span>
-                                </div>
-                            </Col>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-start text-start">
-                                    <div className="d-flex flex-row align-items-start">
-                                        <div className="d-flex flex-column w-100 align-items-start">
-                                            {props.item.Dosen1.ujian.matkul.map((item)=>(
-                                                <span>: {item.nama}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <span>: {props.item.Dosen1.ruangan.nama}</span>
-                                    {props.item.pertukaran.statusDosen2=="Disetujui"&&props.item.pertukaran.statusAdmin=="Disetujui" ?
-                                        <span>: {props.item.Dosen2.dosen.nama}</span>
-                                    :
-                                        <span>: {props.item.Dosen1.dosen.nama}</span>
-                                    }
-                                </div>
-                            </Col>
-                        </Row>
+                    <Col className="align-content-center">
+                        <Row className="justify-content-center">{props.item.Dosen1.ujian.date.toDateString().split(" ")[0]+", "+props.item.Dosen1.ujian.date.toDateString().split(" ")[2]+" "+props.item.Dosen1.ujian.date.toDateString().split(" ")[1]+" "+props.item.Dosen1.ujian.date.toDateString().split(" ")[3]}</Row>
+                        <Row className="justify-content-center">{props.item.Dosen1.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+props.item.Dosen1.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</Row>
+                                {props.item.Dosen1.ujian.matkul.map((item)=>(
+                                    <Row className="justify-content-center">{item.nama}</Row>
+                                ))}
+                        <Row className="justify-content-center">{props.item.Dosen1.ruangan.nama}</Row>
+                        {props.item.pertukaran.statusDosen2=="Disetujui"&&props.item.pertukaran.statusAdmin=="Disetujui" ?
+                            <Row className="justify-content-center">{props.item.Dosen2.dosen.nama}</Row>
+                        :
+                            <Row className="justify-content-center">{props.item.Dosen1.dosen.nama}</Row>
+                        }
                     </Col>
                     <Col xs="1" className="align-content-center" style={{textAlign:"center"}}>
                         <Image src="/arrow-right-circle-fill.svg" alt="Edit" width={25} height={25}/>   
                     </Col>
-                    <Col>
-                        <Row>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-end">
-                                    <span>Tanggal</span>
-                                    <span>Waktu</span>
-                                </div>
-                            </Col>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-start">
-                                    <span>: {props.item.Dosen2.ujian.date.toDateString().split(" ")[0]+", "+props.item.Dosen2.ujian.date.toDateString().split(" ")[2]+" "+props.item.Dosen2.ujian.date.toDateString().split(" ")[1]+" "+props.item.Dosen2.ujian.date.toDateString().split(" ")[3]}</span>
-                                    <span>: {props.item.Dosen2.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+props.item.Dosen2.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</span>
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-end">
-                                    <span>Mata Kuliah</span>
-                                    <span>Ruangan</span>
-                                    <span>Dosen</span>
-                                </div>
-                            </Col>
-                            <Col>
-                                <div className="d-flex flex-column w-100 align-items-start text-start">
-                                    <div className="d-flex flex-row align-items-start">
-                                        <div className="d-flex flex-column w-100 align-items-start">
-                                            {props.item.Dosen2.ujian.matkul.map((item)=>(
-                                                <span>: {item.nama}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <span>: {props.item.Dosen2.ruangan.nama}</span>
-                                    {props.item.pertukaran.statusDosen2=="Disetujui"&&props.item.pertukaran.statusAdmin=="Disetujui" ?
-                                        <span>: {props.item.Dosen1.dosen.nama}</span>
-                                    :
-                                        <span>: {props.item.Dosen2.dosen.nama}</span>
-                                    }
-                                </div>
-                            </Col>
-                        </Row>
+                    <Col className="align-content-center">
+                        <Row className="justify-content-center">{props.item.Dosen2.ujian.date.toDateString().split(" ")[0]+", "+props.item.Dosen2.ujian.date.toDateString().split(" ")[2]+" "+props.item.Dosen2.ujian.date.toDateString().split(" ")[1]+" "+props.item.Dosen2.ujian.date.toDateString().split(" ")[3]}</Row>
+                        <Row className="justify-content-center">{props.item.Dosen2.ujian.mulai.toTimeString().split(" ")[0].substring(0,5)+" - "+props.item.Dosen2.ujian.selesai.toTimeString().split(" ")[0].substring(0,5)}</Row>
+                        {props.item.Dosen2.ujian.matkul.map((item)=>(
+                            <Row className="justify-content-center">{item.nama}</Row>
+                        ))}
+                        <Row className="justify-content-center">{props.item.Dosen2.ruangan.nama}</Row>
+                        {props.item.pertukaran.statusDosen2=="Disetujui"&&props.item.pertukaran.statusAdmin=="Disetujui" ?
+                            <Row className="justify-content-center">{props.item.Dosen1.dosen.nama}</Row>
+                        :
+                            <Row className="justify-content-center">{props.item.Dosen2.dosen.nama}</Row>
+                        }
                     </Col>
                     <Col className="align-content-center">
-                        <Row>
-                            <Col className="text-end">
-                                <Col>
-                                    <Row className="justify-content-end my-1">Admin</Row>
-                                    <Row className="justify-content-end my-1">Dosen</Row>
-                                </Col>
-                            </Col>
-                            <Col>
-                                <Col> 
-                                    <Row className="my-1">
-                                        {statusAdmin.toString()=="Belum Disetujui" ? <>: <Row><Badge pill bg="warning"> Belum Disetujui</Badge></Row></> : null}
-                                        {statusAdmin.toString()=="Disetujui" ? <>: <Row><Badge pill bg="success">Disetujui</Badge></Row></> : null}
-                                        {statusAdmin.toString()=="Ditolak" ? <>: <Row><Badge pill bg="danger">Ditolak</Badge></Row></> : null}
-                                    </Row>
-                                </Col>
-                                <Col>
-                                    <Row className="my-1">
-                                        {props.item.pertukaran.statusDosen2.toString()=="Belum Disetujui" ? <>: <Row><Badge pill bg="warning">Belum Disetujui</Badge></Row></> : null}
-                                        {props.item.pertukaran.statusDosen2.toString()=="Disetujui" ? <>: <Row><Badge pill bg="success">Disetujui</Badge></Row></> : null}
-                                        {props.item.pertukaran.statusDosen2.toString()=="Ditolak" ? <>: <Row><Badge pill bg="danger">Ditolak</Badge></Row></> : null}
-                                    </Row>
-                                </Col>
-                            </Col>
-                        </Row>
-                    </Col>
+                    <Row className="text-center my-1">
+                            {statusAdmin.toString()=="Belum Disetujui" ? <Col>Admin: <Badge pill bg="warning" style={{border:"2px solid black", color:"black"}}> Belum Disetujui</Badge></Col> : null}
+                            {statusAdmin.toString()=="Disetujui" ? <Col>Admin: <Badge pill bg="success" style={{border:"2px solid black", color:"black"}}>Disetujui</Badge></Col> : null}
+                            {statusAdmin.toString()=="Ditolak" ? <Col>Admin: <Badge pill bg="danger" style={{border:"2px solid black", color:"black"}}>Ditolak</Badge></Col> : null}
+                    </Row>
+                    <Row className="text-center my-1">
+                            {props.item.pertukaran.statusDosen2.toString()=="Belum Disetujui" ? <Col>Dosen: <Badge pill bg="warning" style={{border:"2px solid black", color:"black"}}> Belum Disetujui</Badge></Col> : null}
+                            {props.item.pertukaran.statusDosen2.toString()=="Disetujui" ? <Col>Dosen: <Badge pill bg="success" style={{border:"2px solid black", color:"black"}}>Disetujui</Badge></Col> : null}
+                            {props.item.pertukaran.statusDosen2.toString()=="Ditolak" ? <Col>Dosen: <Badge pill bg="danger" style={{border:"2px solid black", color:"black"}}>Ditolak</Badge></Col> : null}
+                    </Row>
+                </Col>
                     <Col className="align-content-center">
-                    {statusAdmin.toString()=="Belum Disetujui" ? 
+                    {statusAdmin.toString()=="Belum Disetujui"&&(props.item.pertukaran.statusDosen2.toString()=="Disetujui"||props.item.pertukaran.statusDosen2.toString()=="Ditolak") ? 
                         <Row className="d-flex flex-row justify-content-center">
                             <AcceptButton onClick={openModalAccept}/>
                             <RejectButton onClick={openModalReject}/>

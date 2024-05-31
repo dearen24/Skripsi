@@ -87,7 +87,7 @@ const ItemPengawas = (props) => {
                         <Col className="align-content-center">
                             <strong>{props.ujian.metode}</strong>
                         </Col>
-                        <Col className="align-content-center">
+                        <Col className="align-content-center" sm="1">
                             <strong>{props.ujian.shift}</strong>
                         </Col>
                         <Col className="align-content-center">
@@ -103,7 +103,7 @@ const ItemPengawas = (props) => {
                                 <div><strong>{dosen.dosenPengajar[0].nama}</strong></div>    
                             ))}
                         </Col>
-                        <Col className="align-content-center">
+                        <Col className="align-content-center d-flex flex-row" sm="3">
                         <div className="d-flex flex-column justify-content-center my-1">
                             {Object.keys(itemSelect).map(([key,value],index)=>(
                                 <div className="d-flex flex-row py-1">  
@@ -125,20 +125,18 @@ const ItemPengawas = (props) => {
                                         </Form.Select>
                                     </div>
                                     <div className="px-1">
-                                        <button className="btn btn-outline-danger" id={String(key)} onClick={deleteField} hidden={props.hiddenAndDisabled} style={{border:"2px solid black"}}>
+                                        <button className="btn btn-danger" id={String(key)} onClick={deleteField} hidden={props.hiddenAndDisabled} style={{border:"2px solid black"}}>
                                             <Image src="/trash-fill.svg" alt="Edit" width={20} height={20} style={{pointerEvents:'none'}}/>
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+                                ))}
                         </div>
-                        </Col>
-                        <Col className="align-content-center">
-                            <div className="d-flex flex-row justify-content-center">
-                                <button className="btn btn-outline-success mx-1" onClick={addField} hidden={props.hiddenAndDisabled} style={{border:"2px solid black"}}>
-                                    <Image src="/plus-lg.svg" alt="Edit" width={20} height={20}/>
-                                </button>
-                            </div>
+                        <div className="px-1 align-content-center">
+                            <button className="btn btn-success mx-1" onClick={addField} hidden={props.hiddenAndDisabled} style={{border:"2px solid black"}}>
+                                <Image src="/plus-lg.svg" alt="Edit" width={20} height={20}/>
+                            </button>
+                        </div>
                         </Col>
                     </Row>
                 </CardBody>

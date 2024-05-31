@@ -28,6 +28,9 @@ export async function getDatesBySemester(semester,masaujian){
             idSemester:semester,
             tipe:masaujian
         },
+        orderBy:{
+            date:'asc'
+        },
         distinct:['date'],
     });
 
@@ -345,6 +348,69 @@ export async function getUjianByDateWaktu(date,waktuMulai,waktuSelesai,idUjian){
     }
     catch(err){
         console.error("Error Mengambil Data");
+        return false;
+    }
+}
+
+export async function makeUjianByExcel(semester,masaujian,data){
+    try{
+        for(let i = 0;i<data.length;i++){
+            let month = "";
+            if(data[i][0].tanggal.includes("Januari")) month = "01";
+            if(data[i][0].tanggal.includes("Pebruari")) month = "02";
+            if(data[i][0].tanggal.includes("Maret")) month = "03";
+            if(data[i][0].tanggal.includes("April")) month = "04";
+            if(data[i][0].tanggal.includes("Mei")) month = "05";
+            if(data[i][0].tanggal.includes("Juni")) month = "06";
+            if(data[i][0].tanggal.includes("Juli")) month = "07";
+            if(data[i][0].tanggal.includes("Agustus")) month = "08";
+            if(data[i][0].tanggal.includes("September")) month = "09";
+            if(data[i][0].tanggal.includes("Oktober")) month = "10";
+            if(data[i][0].tanggal.includes("November")) month = "11";
+            if(data[i][0].tanggal.includes("Desember")) month = "12";
+            let tanggal = data[i][0].tanggal.split(" ")[1];
+            let tahun = data[i][0].tanggal.substring(data[i][0].tanggal.length-4);
+            const date = new Date(tahun+"-"+month+"-"+tanggal).toISOString();
+            for(let j = 0;j<data[i].length;j++){
+                const waktuMulai = new Date(tahun+"-"+month+"-"+tanggal+" "+data[i][j].waktu.split("-")[0]+":00");
+                const waktuSelesai = new Date(tahun+"-"+month+"-"+tanggal+" "+data[i][j].waktu.split("-")[1]+":00");
+                const kode = data[i][j].kode.split("-")[0];
+                const matkulujian = await db.examSubject.findFirst({
+                    where:{
+                        idSemester:semester,
+                        matkul:{
+                            kode:kode,
+                        }
+                    },
+                    include:{
+                        matkul:true,
+                    }
+                });
+
+                if(matkulujian!=null){
+                    // console.log(matkulujian);
+                    await db.exam.create({
+                        data:{
+                            idSemester: semester,
+                            date: date,
+                            mulai: waktuMulai,
+                            selesai: waktuSelesai,
+                            tipe: masaujian,
+                            shift: Number(0),
+                            metode: "Luring",
+                            matkul: {
+                                connect:{id:matkulujian.matkul.id},
+                            }
+                        }
+                    });
+                }
+
+            }
+        }
+        return true;
+    }
+    catch(err){
+        console.error("Error menghapus ujian ", err);
         return false;
     }
 }

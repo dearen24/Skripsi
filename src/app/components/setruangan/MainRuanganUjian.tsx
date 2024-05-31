@@ -150,6 +150,7 @@ export default function MainRuanganUjian({props}){
                         <FormSelect onChange={handleChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS" selected>UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                     <div className="px-1">

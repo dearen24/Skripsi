@@ -39,7 +39,7 @@ const ItemJadwalSaya = (props) => {
                 </Card>
                 {props.jadwalsaya.map((jadwal)=>(
                     props.selectedJadwalSaya == jadwal.id?
-                    <Card className="my-1" onClick={setSelected} id={jadwal.id} style={{borderRadius:"10px",border:"2px solid black", backgroundColor:"#83F28F"}}>
+                    <Card className="my-1" onClick={setSelected} id={jadwal.id} style={{borderRadius:"10px",border:"2px solid black", backgroundColor:"#83F28F", cursor:"pointer"}}>
                         <CardBody id={jadwal.id}>
                             <Row className="text-center" id={jadwal.id}>
                                 <Col className="align-content-center" id={jadwal.id}>{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</Col>
@@ -55,7 +55,7 @@ const ItemJadwalSaya = (props) => {
                         </CardBody>
                     </Card>
                     :
-                    <Card className="my-1" onClick={setSelected} id={jadwal.id} style={{borderRadius:"10px",border:"2px solid black"}}>
+                    <Card className="my-1" onClick={setSelected} id={jadwal.id} style={{borderRadius:"10px",border:"2px solid black", cursor:"pointer"}}>
                         <CardBody id={jadwal.id}>
                             <Row className="text-center" id={jadwal.id}>
                                 <Col className="align-content-center" id={jadwal.id}>{jadwal.ujian.date.toDateString().split(" ")[0]+", "+jadwal.ujian.date.toDateString().split(" ")[2]+" "+jadwal.ujian.date.toDateString().split(" ")[1]+" "+jadwal.ujian.date.toDateString().split(" ")[3]}</Col>

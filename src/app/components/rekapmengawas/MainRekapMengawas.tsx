@@ -1,11 +1,20 @@
 "use client"
 import { useEffect, useState } from "react";
-import { getRekapMengawas } from "../../actions/rekapmengawas";
-import LoadingPengguna from "../../admin/dosen/loading";
+import { createRekapMengawas, getRekapMengawas } from "../../actions/rekapmengawas";
 import { Card, CardBody, Col, FormSelect, Row } from "react-bootstrap";
 import { getSemester } from "@/app/actions/semester";
 import ItemRekapMengawas from "./ItemRekapMengawas";
 import LoadingPage from "../LoadingPage";
+import { getUser } from "@/app/actions/user";
+import SubmitRekapMengawasConfirmationModal from "../modal/SubmitRekapMengawasConfirmation";
+import ToastSuccessMakeSubmitRekapMengawas from "../toast/SuccessSubmitRekapMengawas";
+import PDFRekapMengawas from "../pdf/PDFRekapMengawas";
+import { usePDF } from "react-to-pdf";
+import generatePDF from "../pdf/PDFRekapMengawas";
+import { useRouter } from "next/navigation";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import PDFRekapMengawasTest from "../pdf/PDFRekapMengawasTest";
+import ModalFailSubmitRekapMengawas from "../modal/FailSubmitRekapMengawas";
 
 export default function MainRekapMengawas({props}){
     const [isLoading,setLoading] = useState(true);
@@ -14,8 +23,21 @@ export default function MainRekapMengawas({props}){
     const [selectedData, setSelectedData] = useState(new Object);
     const [maxPage, setMaxPage] = useState(0);
     const [page, setPage] = useState(1);
+    const [user,setUser] = useState(new Object);
     const [search, setSearch] = useState("");
     const [displayedRekap, setDisplayedRekap] = useState(new Object);
+    const [modal,setModal] = useState(false);
+    const [modalFail,setModalFail] = useState(false);
+    const [toast,setToast] = useState(false);
+    const [namaSemester,setNamaSemester] = useState("");
+    const router = useRouter();
+
+    const openModal = () => setModal(true);
+    const closeModal = () => setModal(false);
+    const openModalFail = () => setModalFail(true);
+    const closeModalFail = () => setModalFail(false);
+    const openToast = () => setToast(true);
+    const closeToast = () => setToast(false);
 
     useEffect(() => {
     // Fetch data on component mount
@@ -23,18 +45,28 @@ export default function MainRekapMengawas({props}){
         try {
             const semester = await getSemester();
             const rekap = await getRekapMengawas(props.semester.id,"UTS");
-        
-            function compareByJumlah(a, b) {
-                return a._count.idDosen - b._count.idDosen;
-              }
+            const user = await getUser();
+            const arrRekap = [];
 
-            //rekap.sort(compareByJumlah);
+            for(let i = 0;i<rekap.length;i++){
+                const index = user.findIndex(a=>a.id==rekap[i].idDosen);
+                const userObj = user[index];
+                if(index!=-1){
+                    userObj.kuotaMengawas = rekap[i].kuota;
+                    userObj.jumlahMengawas = rekap[i].jumlahMengawas;
+                    userObj.sisaMengawas = rekap[i].sisaMengawas;
+                    userObj.kuotaSelanjutnya = rekap[i].kuotaSelanjutnya;
+                    arrRekap.push(userObj);
+                }
+            }
 
+            setNamaSemester(props.semester.semester);
+            setUser(user);
             setSelectedData({tipe:"UTS",semester:props.semester.id});
-            setMaxPage(Math.ceil(rekap.length/10));
-            setDisplayedRekap(rekap.slice(0,10));
+            setMaxPage(Math.ceil(arrRekap.length/10));
+            setDisplayedRekap(arrRekap.slice(0,10));
             setSemester(semester);
-            setRekap(rekap);
+            setRekap(arrRekap);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -49,15 +81,25 @@ export default function MainRekapMengawas({props}){
 
         const rekapTemp = await getRekapMengawas(e.target.value,tempData.tipe);
         
-        // function compareByJumlah(a, b) {
-        //     return a._count.idDosen - b._count.idDosen;
-        // }
+        const arrRekap = [];
 
-        // rekapTemp.sort(compareByJumlah);
-
-        setRekap(rekapTemp);
-        setMaxPage(Math.ceil(rekapTemp.length/10));
-        setDisplayedRekap(rekapTemp.slice(0,10));
+        for(let i = 0;i<rekapTemp.length;i++){
+            const index = user.findIndex(a=>a.id==rekapTemp[i].idDosen);
+            const userObj = user[index];
+            if(index!=-1){
+                userObj.kuotaMengawas = rekapTemp[i].kuota;
+                userObj.jumlahMengawas = rekapTemp[i].jumlahMengawas;
+                userObj.sisaMengawas = rekapTemp[i].sisaMengawas;
+                userObj.kuotaSelanjutnya = rekapTemp[i].kuotaSelanjutnya;
+                arrRekap.push(userObj);
+            }
+        }
+        if(rekapTemp.length!=0){
+            setNamaSemester(rekapTemp[0].semester.semester);
+        }
+        setRekap(arrRekap);
+        setMaxPage(Math.ceil(arrRekap.length/10));
+        setDisplayedRekap(arrRekap.slice(0,10));
         setSelectedData(tempData);
     }
 
@@ -67,15 +109,22 @@ export default function MainRekapMengawas({props}){
 
         const rekapTemp = await getRekapMengawas(tempData.semester,e.target.value);
         
-        // function compareByJumlah(a, b) {
-        //     return a._count.idDosen - b._count.idDosen;
-        // }
+        const arrRekap = [];
 
-        // rekapTemp.sort(compareByJumlah);
-
-        setMaxPage(Math.ceil(rekapTemp.length/10));
-        setDisplayedRekap(rekapTemp.slice(0,10));
-        setRekap(rekapTemp);
+        for(let i = 0;i<rekapTemp.length;i++){
+            const index = user.findIndex(a=>a.id==rekapTemp[i].idDosen);
+            const userObj = user[index];
+            if(index!=-1){
+                userObj.kuotaMengawas = rekapTemp[i].kuota;
+                userObj.jumlahMengawas = rekapTemp[i].jumlahMengawas;
+                userObj.sisaMengawas = rekapTemp[i].sisaMengawas;
+                userObj.kuotaSelanjutnya = rekapTemp[i].kuotaSelanjutnya;
+                arrRekap.push(userObj);
+            }
+        }
+        setRekap(arrRekap);
+        setMaxPage(Math.ceil(arrRekap.length/10));
+        setDisplayedRekap(arrRekap.slice(0,10));
         setSelectedData(tempData);
     }
 
@@ -86,6 +135,10 @@ export default function MainRekapMengawas({props}){
             setPage(currentPage);
             setDisplayedRekap(rekap.slice((currentPage-1)*10,((currentPage-1)*10)+10));
         }
+    }
+
+    const printRekapMengawas = () => {
+       router.push("/admin/rekapmengawas/"+selectedData.semester+"/"+selectedData.tipe);
     }
 
     const prevPage = () => {
@@ -101,6 +154,23 @@ export default function MainRekapMengawas({props}){
         setSearch(e.target.value);
     }
 
+    const addRekap = async () => {
+        const rekapNow = await getRekapMengawas(selectedData.semester,selectedData.tipe);
+        if(rekapNow.length==0){
+            const response = await createRekapMengawas(selectedData.semester,selectedData.tipe);
+            if(response){
+                closeModal();
+                openToast();
+            }
+            else{
+                alert("Gagal mengupulkan rekap mengawas");
+            }
+        }
+        else{
+            closeModal();
+            openModalFail();
+        }
+    }
 
     if(isLoading){
         return <LoadingPage/>
@@ -123,8 +193,20 @@ export default function MainRekapMengawas({props}){
                     <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                         <option value="UTS">UTS</option>
                         <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </FormSelect>
                 </div>
+                <button className="btn btn-dark" onClick={openModal} style={{backgroundColor:"#272829"}}><strong>Masukan Rekap</strong></button>
+                <PDFDownloadLink document={<PDFRekapMengawasTest rekap={rekap} masaujian={selectedData.tipe} semester={namaSemester}/>} fileName="Rekap Mengawas">
+                    {({loading})=> 
+                        loading ? (
+                            <button className="btn btn-dark mx-1 h-100" style={{backgroundColor:"#272829"}} disabled><strong>Loading...</strong></button>
+                        ) : (
+                            <button className="btn btn-dark mx-1 h-100" style={{backgroundColor:"#272829"}}><strong>Cetak Rekap</strong></button>
+                        )
+                    }
+                </PDFDownloadLink>
+                {/* <button className="btn btn-dark mx-1" onClick={printRekapMengawas} style={{backgroundColor:"#272829"}}><strong>Cetak Rekap Mengawas</strong></button> */}
             </div>
             <input className="form-control w-25 mx-1 mb-1" placeholder="Search" onChange={changeSearch} style={{border:"2px solid black"}}/>
             <div className="content mx-1">
@@ -139,6 +221,9 @@ export default function MainRekapMengawas({props}){
                             </Col>
                             <Col>
                                 <strong>Total Mengawas</strong>
+                            </Col>
+                            <Col>
+                                <strong>Sisa Mengawas</strong>
                             </Col>
                             <Col>
                                 <strong>Kuota Mengawas Selanjutnya</strong>
@@ -167,98 +252,13 @@ export default function MainRekapMengawas({props}){
                 null
                 }
             </div>
+            <ToastSuccessMakeSubmitRekapMengawas toast={toast} closeToast={closeToast}/>
+            <ModalFailSubmitRekapMengawas modal={modalFail} closeModal={closeModalFail}/>
+            {rekap!=null ?
+                <SubmitRekapMengawasConfirmationModal modal={modal} closeModal={closeModal} onAction={addRekap} semester={namaSemester} masaujian={selectedData.tipe}/>
+            :
+                null
+            }
         </div>
     )
-    
-    // return(
-    //     <>
-    //         <div className="table-responsive w-100">
-    //             <h1>Rekap Mengawas</h1>
-    //             <div className="d-flex flex-row py-1">
-    //                 <div>
-    //                     <FormSelect onChange={onChangeSemester}>
-    //                         {semester.map((sem)=>(
-    //                             sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
-    //                         ))}
-    //                     </FormSelect>
-    //                 </div>
-    //                 <div className="px-1">
-    //                     <FormSelect onChange={onChangeTipe}>
-    //                         <option value="UTS">UTS</option>
-    //                         <option value="UAS">UAS</option>
-    //                     </FormSelect>
-    //                 </div>
-    //             </div>
-    //             <input className="form-control w-25" placeholder="Search" onChange={changeSearch}/>
-    //             <div className="table-wrapper">
-    //                 <table className="table table-hover align-middle">
-    //                     <thead className="table-dark">
-    //                         <tr className="">    
-    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Nama Dosen</th>						
-    //                             <th className="text-center">Jumlah Mengawas</th>
-    //                         </tr>
-    //                     </thead>
-    //                     {search=="" ?
-    //                     displayedRekap.map((rek)=>(
-    //                         <ItemRekapMengawas rekap={rek}/>
-    //                     ))
-    //                     :
-    //                     rekap.map((rek)=>(
-    //                         rek.nama.toLowerCase().includes(search.toLowerCase()) ?
-    //                         <ItemRekapMengawas rekap={rek}/>
-    //                         :
-    //                         null
-    //                     ))
-    //                     }
-    //                 </table>
-    //             </div>
-    //             {search=="" && rekap.length > 10 ? 
-    //             <div>
-    //                 <button className="btn mx-1" onClick={prevPage} style={{backgroundColor:"#272829", color:"white"}}>Prev</button>
-    //                 <button className="btn" onClick={nextPage} style={{backgroundColor:"#272829", color:"white"}}>Next</button>
-    //             </div>
-    //             :
-    //             null
-    //             }
-    //         </div>
-    //     </>
-    // )
 }
-
-// Median
-// function findMedian(arr) {
-//     arr.sort((a, b) => a - b);
-//     const middleIndex = Math.floor(arr.length / 2);
-
-//     if (arr.length % 2 === 0) {
-//         return (arr[middleIndex - 1] + arr[middleIndex]) / 2;
-//     } else {
-//         return arr[middleIndex];
-//     }
-// } 
-
-// Mode
-// function findMedian(arr) {
-//     arr.sort((a, b) => a - b);
-//     let count = 1;
-//     let maxCount = 1;
-//     let mode = -1;
-//     for(let i = 1;i<arr.length;i++){
-//         if(arr[i]==arr[i-1]){
-//             count++;
-//         }
-//         else{
-//             if(count>maxCount){
-//                 maxCount = count;
-//                 mode = arr[i];
-//             }
-//             count = 1;
-//         }
-//     }
-
-//     if(count>maxCount){
-//         mode = arr[arr.length-1];
-//     }
-
-//     return maxCount;
-// }

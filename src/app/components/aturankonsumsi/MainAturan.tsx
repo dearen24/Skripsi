@@ -53,10 +53,7 @@ export default function MainAturan(){
             <div className="content mx-1">
                 <Card style={{backgroundColor:"#272829",color:"white"}}>
                     <CardBody>
-                        <Row className="text-center">
-                            <Col>
-                                <strong>#</strong>
-                            </Col>
+                        <Row className="text-center justify-content-center">
                             <Col>
                                 <strong>8 - 10</strong>
                             </Col>
@@ -78,7 +75,7 @@ export default function MainAturan(){
                             <Col>
                                 <strong>Lunch</strong>
                             </Col>
-                            <Col>
+                            <Col md="2">
                                 <strong>Action</strong>
                             </Col>
                         </Row>

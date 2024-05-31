@@ -20,6 +20,7 @@ export default function MainPertukaranAdmin({props}){
         // Fetch data on component mount
         const fetchData = async () => {
             const pertukaran = await getAllPengajuan(session.semester,selectedTipe);
+            console.log(pertukaran);
             const semester = await getSemester();
             
             setSemester(semester);
@@ -43,6 +44,7 @@ export default function MainPertukaranAdmin({props}){
 
     const onChangeTipe = async (e) => {
         const pertukaranTemp = await getAllPengajuan(selectedSemester,e.target.value);
+        
         setPertukaran(pertukaranTemp);
         setSelectedTipe(e.target.value);
     }
@@ -58,13 +60,13 @@ export default function MainPertukaranAdmin({props}){
     return(
         <div className="d-flex flex-column w-100 h-100">
             <div className="upper mx-1">
-                <h3><strong>Pengajuan Pertukaran Jadwal</strong></h3>
+                <h3><strong>Pertukaran Jadwal</strong></h3>
             </div>
             <div className="d-flex flex-row my-1 mx-1">
                 <div>
                     <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
                         {semester.map((sem)=>(
-                            <option value={sem.id}>{sem.semester}</option>
+                            sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                         ))}
                     </FormSelect>
                 </div>
@@ -72,6 +74,7 @@ export default function MainPertukaranAdmin({props}){
                     <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                         <option value="UTS">UTS</option>
                         <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </FormSelect>
                 </div>
                 <button className="btn btn-dark" onClick={addPertukaran} style={{backgroundColor:"#272829"}}><strong>Tambah Pertukaran</strong></button>

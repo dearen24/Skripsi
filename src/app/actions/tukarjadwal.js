@@ -21,32 +21,33 @@ export async function getAllPengajuan(idSemester,tipe){
 
     for(let i = 0;i<filteredMyUjian.length;i++){
         const item = new Object()
-        const pertukaran = await db.historyTukar.findFirst({
+        const pertukaran = await db.historyTukar.findMany({
             where:{
-                idUjianRuanganDosen1:String(filteredMyUjian[i].id),
-                idSemester:String(idSemester)
+                idUjianRuanganDosen1:String(filteredMyUjian[i].id)
             }
         });
 
-        if(pertukaran!=null){
-            item.Dosen1 = filteredMyUjian[i];
-            const otherUjian = await db.examRoomLec.findFirst({
-                where:{
-                    id:pertukaran.idUjianRuanganDosen2,
-                },
-                include:{
-                    ujian:{
-                        include:{
-                            matkul:true,
-                        }
+        if(pertukaran.length!=0){
+            for(let j = 0;j<pertukaran.length;j++){
+                item.Dosen1 = filteredMyUjian[i];
+                const otherUjian = await db.examRoomLec.findFirst({
+                    where:{
+                        id:pertukaran[j].idUjianRuanganDosen2,
                     },
-                    ruangan:true,
-                    dosen:true,
-                }
-            });
-            item.Dosen2 = otherUjian;
-            item.pertukaran = pertukaran;
-            arr.push(item); 
+                    include:{
+                        ujian:{
+                            include:{
+                                matkul:true,
+                            }
+                        },
+                        ruangan:true,
+                        dosen:true,
+                    }
+                });
+                item.Dosen2 = otherUjian;
+                item.pertukaran = pertukaran[j];
+                arr.push(item); 
+            }
         }
     }
 
@@ -74,33 +75,35 @@ export async function getMyPengajuan(idDosen,idSemester,tipe){
     const arr = [];
 
     for(let i = 0;i<filteredMyUjian.length;i++){
-        const item = new Object()
-        const pertukaran = await db.historyTukar.findFirst({
+        const pertukaran = await db.historyTukar.findMany({
             where:{
                 idUjianRuanganDosen1:String(filteredMyUjian[i].id),
                 idSemester:String(idSemester)
             }
         });
 
-        if(pertukaran!=null){
-            item.Dosen1 = filteredMyUjian[i];
-            const otherUjian = await db.examRoomLec.findFirst({
-                where:{
-                    id:pertukaran.idUjianRuanganDosen2,
-                },
-                include:{
-                    ujian:{
-                        include:{
-                            matkul:true,
-                        }
+        if(pertukaran.length!=0){
+            for(let j = 0;j<pertukaran.length;j++){
+                const item = new Object();
+                item.Dosen1 = filteredMyUjian[i];
+                const otherUjian = await db.examRoomLec.findFirst({
+                    where:{
+                        id:pertukaran[j].idUjianRuanganDosen2,
                     },
-                    ruangan:true,
-                    dosen:true,
-                }
-            });
-            item.Dosen2 = otherUjian;
-            item.pertukaran = pertukaran;
-            arr.push(item); 
+                    include:{
+                        ujian:{
+                            include:{
+                                matkul:true,
+                            }
+                        },
+                        ruangan:true,
+                        dosen:true,
+                    }
+                });
+                item.Dosen2 = otherUjian;
+                item.pertukaran = pertukaran[j];
+                arr.push(item); 
+            }
         }
     }
 
@@ -128,33 +131,35 @@ export async function getOtherPengajuan(idDosen,idSemester,tipe){
     const arr = [];
 
     for(let i = 0;i<filteredMyUjian.length;i++){
-        const item = new Object()
-        const pertukaran = await db.historyTukar.findFirst({
+        const pertukaran = await db.historyTukar.findMany({
             where:{
                 idUjianRuanganDosen2:String(filteredMyUjian[i].id),
                 idSemester:String(idSemester)
             }
         });
 
-        if(pertukaran!=null){
-            item.Dosen1 = filteredMyUjian[i];
-            const otherUjian = await db.examRoomLec.findFirst({
-                where:{
-                    id:pertukaran.idUjianRuanganDosen1,
-                },
-                include:{
-                    ujian:{
-                        include:{
-                            matkul:true,
-                        }
+        if(pertukaran.length!=0){
+            for(let j = 0;j<pertukaran.length;j++){
+                const item = new Object();
+                item.Dosen1 = filteredMyUjian[i];
+                const otherUjian = await db.examRoomLec.findFirst({
+                    where:{
+                        id:pertukaran[j].idUjianRuanganDosen1,
                     },
-                    ruangan:true,
-                    dosen:true,
-                }
-            });
-            item.Dosen2 = otherUjian;
-            item.pertukaran = pertukaran;
-            arr.push(item); 
+                    include:{
+                        ujian:{
+                            include:{
+                                matkul:true,
+                            }
+                        },
+                        ruangan:true,
+                        dosen:true,
+                    }
+                });
+                item.Dosen2 = otherUjian;
+                item.pertukaran = pertukaran[j];
+                arr.push(item); 
+            }
         }
     }
 
@@ -242,14 +247,31 @@ export async function insertPertukaran(id1,id2,idSemester){
     }
 }
 
-export async function deletePertukaran(id1,id2){
+export async function insertPertukaranAdmin(id1,id2,idSemester){
+    try{
+        await db.historyTukar.create({
+            data:{
+                idUjianRuanganDosen1:String(id1),
+                idUjianRuanganDosen2:String(id2),
+                statusDosen2:"Disetujui",
+                statusAdmin:"Disetujui",
+                idSemester:String(idSemester),
+            }
+        });
+
+        return true;
+    }
+    catch(err){
+        console.error("Error menambah pertukaran ",err);
+        return false;
+    }
+}
+
+export async function deletePertukaran(id){
     try{
         await db.historyTukar.delete({
             where:{
-                idUjianRuanganDosen1_idUjianRuanganDosen2:{
-                    idUjianRuanganDosen1:String(id1),
-                    idUjianRuanganDosen2:String(id2),
-                }
+                id:id
             }
         })
 
@@ -261,14 +283,11 @@ export async function deletePertukaran(id1,id2){
     }
 }
 
-export async function acceptPertukaran(id1,id2){
+export async function acceptPertukaran(id){
     try{
         await db.historyTukar.update({
             where:{
-                idUjianRuanganDosen1_idUjianRuanganDosen2:{
-                    idUjianRuanganDosen1:String(id1),
-                    idUjianRuanganDosen2:String(id2),
-                }
+                id:id,
             },
             data:{
                 statusDosen2:"Disetujui"
@@ -283,14 +302,11 @@ export async function acceptPertukaran(id1,id2){
     }
 }
 
-export async function rejectPertukaran(id1,id2){
+export async function rejectPertukaran(id){
     try{
         await db.historyTukar.update({
             where:{
-                idUjianRuanganDosen1_idUjianRuanganDosen2:{
-                    idUjianRuanganDosen1:String(id1),
-                    idUjianRuanganDosen2:String(id2),
-                }
+                id:id,
             },
             data:{
                 statusDosen2:"Ditolak"
@@ -305,14 +321,11 @@ export async function rejectPertukaran(id1,id2){
     }
 }
 
-export async function acceptPertukaranAdmin(id1,id2){
+export async function acceptPertukaranAdmin(id){
     try{
         await db.historyTukar.update({
             where:{
-                idUjianRuanganDosen1_idUjianRuanganDosen2:{
-                    idUjianRuanganDosen1:String(id1),
-                    idUjianRuanganDosen2:String(id2),
-                }
+                id:id,
             },
             data:{
                 statusAdmin:"Disetujui"
@@ -327,14 +340,11 @@ export async function acceptPertukaranAdmin(id1,id2){
     }
 }
 
-export async function rejectPertukaranAdmin(id1,id2){
+export async function rejectPertukaranAdmin(id){
     try{
         await db.historyTukar.update({
             where:{
-                idUjianRuanganDosen1_idUjianRuanganDosen2:{
-                    idUjianRuanganDosen1:String(id1),
-                    idUjianRuanganDosen2:String(id2),
-                }
+                id:id,
             },
             data:{
                 statusAdmin:"Ditolak"
@@ -470,4 +480,62 @@ export async function tukarJadwal(idJadwal1,idDosen1,idJadwal2,idDosen2,status){
         console.error("Error menukar jadwal ",err);
         return false;
     }
+}
+
+export async function checkPendingJadwal(idUjianRuanganDosen,semester,masaujian){
+    const item = new Object();
+    const jadwal = await db.examRoomLec.findFirst({
+        where:{
+            id:idUjianRuanganDosen,
+            ujian:{
+                tipe:masaujian,
+                idSemester:semester
+            }
+        },
+    });
+
+    item.jadwal = jadwal;
+
+    const pending1 = await db.historyTukar.findFirst({
+        where:{
+            OR:[
+                {
+                    idSemester:semester,
+                    idUjianRuanganDosen1:idUjianRuanganDosen,
+                    statusDosen2:"Belum Disetujui",
+                    statusDosen2:"Belum Disetujui",
+                },
+                {
+                    idSemester:semester,
+                    idUjianRuanganDosen1:idUjianRuanganDosen,
+                    statusDosen2:"Disetujui",
+                    statusDosen2:"Belum Disetujui",
+                }
+            ],
+        }
+    });
+
+    const pending2 = await db.historyTukar.findFirst({
+        where:{
+            OR:[
+                {
+                    idSemester:semester,
+                    idUjianRuanganDosen2:idUjianRuanganDosen,
+                    statusDosen2:"Belum Disetujui",
+                    statusDosen2:"Belum Disetujui",
+                },
+                {
+                    idSemester:semester,
+                    idUjianRuanganDosen2:idUjianRuanganDosen,
+                    statusDosen2:"Disetujui",
+                    statusDosen2:"Belum Disetujui",
+                }
+            ],
+        }
+    });
+
+    item.pending1 = pending1;
+    item.pending2 = pending2;
+
+    return item;
 }

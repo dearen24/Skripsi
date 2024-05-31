@@ -30,7 +30,7 @@ const ItemRuanganUjian = (ujian) => {
     }, []);
 
     return(
-        <Card className="my-1" style={{borderRadius:"10px"}}>
+        <Card className="my-1" style={{borderRadius:"10px",border:"2px solid black"}}>
             <CardBody>
                 <Row className="text-center">
                     <Col className="align-content-center">

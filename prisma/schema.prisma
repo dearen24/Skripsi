@@ -55,6 +55,7 @@ model Semester {
   tukarjadwal         HistoryTukar[]
   konsumsinonpengawas KonsumsiNonPengawas[]
   rekapmengawas       RekapMengawas[]
+  gantijadwal         HistoryGanti[]
 }
 
 model Subject {
@@ -103,13 +104,13 @@ model ExamRoomLec {
 }
 
 model HistoryTukar {
+  id                      String    @id @default(uuid())
   idUjianRuanganDosen1    String
   idUjianRuanganDosen2    String
   statusDosen2            String
   statusAdmin             String
   idSemester              String
   semester                Semester @relation(fields: [idSemester], references: [id])
-  @@id([idUjianRuanganDosen1,idUjianRuanganDosen2])
 }
 
 model KonsumsiNonPengawas {
@@ -124,13 +125,23 @@ model KonsumsiNonPengawas {
 }
 
 model RekapMengawas {
-  id              String    @id @default(uuid())
-  idSemester      String
-  idDosen         String
-  dosen           User     @relation(fields: [idDosen], references: [id])
-  semester        Semester @relation(fields: [idSemester], references: [id])
-  kuota           Int
-  sisaSebelumnya  Int
-  jumlahMengawas  Int
-  sisa            Int
+  id                String    @id @default(uuid())
+  idSemester        String
+  idDosen           String
+  masaujian         String
+  dosen             User     @relation(fields: [idDosen], references: [id])
+  semester          Semester @relation(fields: [idSemester], references: [id])
+  kuota             Int
+  jumlahMengawas    Int
+  sisaMengawas      Int
+  kuotaSelanjutnya  Int
+}
+
+model HistoryGanti {
+  id                    String    @id @default(uuid())
+  idUjianRuanganDosen   String
+  idDosenDigantikan     String
+  idDosenMenggantikan   String
+  semester              Semester @relation(fields: [idSemester], references: [id])
+  idSemester            String
 }

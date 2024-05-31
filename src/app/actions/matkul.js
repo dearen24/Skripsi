@@ -6,10 +6,27 @@ export async function getMatkul(){
     return allMatkul;
 }
 
+export async function getMatkulBySemester(semester){
+    const allMatkul = await db.subject.findMany({
+        include:{
+            matkulujian:{
+                where:{
+                    idSemester:semester
+                }
+            }
+        }
+    });
+    return allMatkul;
+}
+
 export async function getMatkulById(id){
     const matkul = await db.subject.findFirst({
         where:{
             id:String(id)
+        },
+        include:{
+            matkulujian:true,
+            ujian:true
         }
     });
 

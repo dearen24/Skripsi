@@ -184,6 +184,7 @@ export default function HitungKonsumsi({props}){
                         closeModalLoading();
                         openModalFail();
                         fail = true;
+                        console.log(date);
                         break;
                     }
                     const snack = aturan[index].snack;
@@ -221,6 +222,7 @@ export default function HitungKonsumsi({props}){
                         <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                 </div>

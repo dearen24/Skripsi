@@ -97,8 +97,8 @@ export default function AddSemester(){
                 </div>
             </div>
             
-            <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Jabatan"}/>
-            <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Jabatan"}/>
+            <ModalSuccessAdd modal={modal} closeModal={closeModal} backToHomepage={backToHomepage} page={"Semester"}/>
+            <ToastSuccessAdd toast={toast} closeToast={closeToast} page={"Semester"}/>
             <ModalMultipleActiveSemesterAlert modal={modalSemester} closeModal={closeModalSemester} action={"Menambahkan"}/>
             <ToastErrorInput toast={toastError} closeToast={closeToastError} error={error} />
         </>

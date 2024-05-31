@@ -4,7 +4,6 @@ import { DeleteButton } from "../buttons/DeleteButton";
 import { Badge, Card, CardBody, Col, Row } from "react-bootstrap";
 
 const ItemRekapMengawas = (rekap) => {
-   
     return(
         <Card className="my-1" style={{borderRadius:"10px",border:"2px solid black"}}>
             <CardBody>
@@ -13,27 +12,21 @@ const ItemRekapMengawas = (rekap) => {
                         <strong>{rekap.rekap.nama}</strong>
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{rekap.rekap.role.kuotaMengawas}</strong>
+                        <strong>{rekap.rekap.kuotaMengawas}</strong>
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{rekap.rekap.countMengawas}</strong>
+                        <strong>{rekap.rekap.jumlahMengawas}</strong>
                     </Col>
                     <Col className="align-content-center">
-                        <strong>{rekap.rekap.nextKuota}</strong>
+                        <strong>{rekap.rekap.sisaMengawas}</strong>
+                    </Col>
+                    <Col className="align-content-center">
+                        <strong>{rekap.rekap.kuotaSelanjutnya}</strong>
                     </Col>
                 </Row>
             </CardBody>
         </Card>
     )
-
-    // return(
-    //     <tbody>
-    //         <tr>
-    //             <td className="text-center">{rekap.rekap.nama}</td>
-    //             <td className="text-center">{rekap.rekap._count.idDosen}</td>
-    //         </tr>
-    //     </tbody>
-    // )
 }
 
 export default ItemRekapMengawas;

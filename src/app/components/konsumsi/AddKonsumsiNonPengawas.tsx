@@ -122,7 +122,7 @@ export default function AddKonsumsiNonPengawas(){
                                 </div>
                                 <div className="form-group w-50">
                                     <label>Catatan</label>
-                                    <textarea name="catatan" className="form-control" placeholder="Masukan Kuota Mengawas" rows={3} style={{border:"2px solid black"}}/>
+                                    <textarea name="catatan" className="form-control" placeholder="Masukan Catatan" rows={3} style={{border:"2px solid black"}}/>
                                 </div>
                             </div>
                         </div>

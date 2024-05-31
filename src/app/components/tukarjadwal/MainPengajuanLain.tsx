@@ -55,18 +55,19 @@ export default function MainPengajuanLain({props}){
             <div className="upper mx-1">
                 <h3><strong>Pengajuan Dosen Lain</strong></h3>
             </div>
-            <div className="d-flex flex-row my-1">
+            <div className="d-flex flex-row my-1 mx-1">
                 <div>
-                    <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
+                    <FormSelect onChange={onChangeSemester} style={{border:"2px solid black", cursor:"pointer"}}>
                         {semester.map((sem)=>(
-                            <option value={sem.id}>{sem.semester}</option>
+                            sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                         ))}
                     </FormSelect>
                 </div>
                 <div className="px-1">
-                    <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
+                    <FormSelect onChange={onChangeTipe} style={{border:"2px solid black", cursor:"pointer"}}>
                         <option value="UTS">UTS</option>
                         <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </FormSelect>
                 </div>
             </div>
@@ -107,52 +108,4 @@ export default function MainPengajuanLain({props}){
             </div>
         </div>
     )
-
-    // return(
-    //     <>
-    //         <div className="table-responsive w-100">
-    //             <h1>Pengajuan Dosen Lain</h1>
-    //             <div className="d-flex flex-row">
-    //                 <div>
-    //                     <FormSelect onChange={onChangeSemester}>
-    //                         {semester.map((sem)=>(
-    //                             <option value={sem.id}>{sem.semester}</option>
-    //                         ))}
-    //                     </FormSelect>
-    //                 </div>
-    //                 <div>
-    //                     <FormSelect onChange={onChangeTipe}>
-    //                         <option value="UTS">UTS</option>
-    //                         <option value="UAS">UAS</option>
-    //                     </FormSelect>
-    //                 </div>
-    //             </div>
-    //             <div className="table-wrapper">
-    //                 <table className="table table-hover align-middle">
-    //                     <thead className="table-dark">
-    //                         <tr className="">    
-    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Dari</th>
-    //                             <th className="text-center"></th>					
-    //                             <th className="text-center">Ke</th>
-    //                             <th className="text-center">Status</th>
-    //                             <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
-    //                         </tr>
-    //                     </thead>
-    //                     {pertukaranLain.map((item)=>(
-    //                         item.pertukaran.statusDosen2!="Disetujui"&&item.pertukaran.statusAdmin!="Disetujui" ?
-    //                         <ItemPengajuanLain item={item}/>
-    //                         :
-    //                         null
-    //                     ))}
-    //                     {pertukaranSaya.map((item)=>(
-    //                         item.pertukaran.statusDosen2=="Disetujui"&&item.pertukaran.statusAdmin=="Disetujui" ?
-    //                         <ItemPengajuanLain item={item}/>
-    //                         :
-    //                         null
-    //                     ))}
-    //                 </table>
-    //             </div>
-    //         </div>
-    //     </>    
-    // )
 }

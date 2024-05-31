@@ -2,7 +2,7 @@ import {z} from "zod"
 
 export const PenggunaSchema = z.object({
     email: z.string().email({message:"Email tidak valid!"}),
-    nik: z.string().regex(new RegExp("^[0-9]*$"),{message:"NIK tidak valid!"}).min(16,{message:"NIK tidak valid!"}).max(16,{message:"NIK tidak valid!"}),
+    nik: z.string().regex(new RegExp("^[0-9]*$"),{message:"NIK tidak valid!"}),
     nama: z.string({message:"Nama tidak valid!"}).max(100,{message:"Nama tidak valid!"}).min(1,{message:"Nama tidak valid!"}),
     jabatan: z.string().uuid({message:"Jabatan tidak valid!"})
 });
@@ -13,7 +13,6 @@ export const JabatanSchema = z.object({
 });
 
 export const SemesterSchema = z.object({
-    semester: z.string({message:"Semester tidak valid!"}).max(100,{message:"Semester tidak valid!"}).min(1,{message:"Semester tidak valid!"}),
     status: z.boolean({message:"Status tidak valid!"})
 });
 

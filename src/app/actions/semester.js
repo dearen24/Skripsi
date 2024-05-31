@@ -10,6 +10,24 @@ export async function getSemesterById(id){
     const role = await db.semester.findFirst({
         where:{
             id:String(id)
+        },
+        include:{
+            matkulujian:true,
+            ujian:true,
+            tukarjadwal:true,
+            konsumsinonpengawas:true,
+            rekapmengawas:true,
+            gantijadwal:true,
+        }
+    });
+
+    return role;
+}
+
+export async function getSemesterByNama(semester){
+    const role = await db.semester.findFirst({
+        where:{
+            semester:String(semester)
         }
     });
 
@@ -26,20 +44,22 @@ export async function getActiveSemester(){
     return semester;
 }
 
-export async function addSemester(formData){
+export async function addSemester(semester){
     "use server"
-    const namaSemester = formData.get('semester').toString();
-    let status = false;
-    if(formData.get('status').toString()=="Aktif"){
-        status = true;
-    }
     try{
-        await db.semester.create({
-            data:{
-                semester: namaSemester,
-                status: status,
+        const sem = await db.semester.findFirst({
+            where:{
+                semester:semester,
             }
         });
+        if(sem==null){
+            await db.semester.create({
+                data:{
+                    semester: semester,
+                    status: false,
+                }
+            });
+        }
         return true;
     }   
     catch(err){
@@ -48,20 +68,13 @@ export async function addSemester(formData){
     }
 }
 
-export async function editSemester(formData,id){
-    const namaSemester = formData.get('semester').toString();
-    let status = false;
-    if(formData.get('status').toString()=="Aktif"){
-        status=true;
-    }
-    
+export async function editSemester(id,status){
     try{
         await db.semester.update({
             where:{
                 id:String(id)
             },
             data:{
-                semester: namaSemester,
                 status: status
             }
         });

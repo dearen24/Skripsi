@@ -10,6 +10,9 @@ export async function getRuanganById(id){
     const role = await db.classroom.findFirst({
         where:{
             id:String(id)
+        },
+        include:{
+            ujian:true
         }
     });
 

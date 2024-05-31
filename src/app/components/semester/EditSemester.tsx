@@ -50,14 +50,13 @@ export default function EditSemester({params}){
             }
 
             const data = {
-                semester: formData.get("semester"),
                 status: status,
             }
     
             const validation = SemesterSchema.safeParse(data);
     
             if(validation.success){
-                const response = await editSemester(formData,params);
+                const response = await editSemester(params,status);
                 if(response==true){
                     openToast();
                 }
@@ -69,7 +68,6 @@ export default function EditSemester({params}){
                 setError(validation.error.issues);
                 openToastError();
             }
-            
         }
     }
 
@@ -86,12 +84,6 @@ export default function EditSemester({params}){
                 <div>
                     <form action={edit}>
                         <div className="d-flex flex-row w-100">
-                            <div className="w-50">
-                                <div className="form-group w-50">
-                                    <label>Nama Semester</label>
-                                    <input type="text" name="semester" className="form-control" defaultValue={semester?.semester} placeholder="Masukan nama semester" style={{border:"2px solid black"}}/>
-                                </div>
-                            </div>
                             <div className="w-50">
                                 <div className="form-group w-50">
                                     <label>Semester</label>

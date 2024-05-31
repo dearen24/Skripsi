@@ -15,11 +15,15 @@ export async function getSessionServerAdmin() {
         }
     });
 
-    const semester = await db.semester.findFirst({
+    let semester = await db.semester.findFirst({
         where:{
             status:true,
         }
     });
+
+    if(semester==null){
+        semester = await db.semester.findFirst();
+    }
 
     let sessionData = session?.user;
 
@@ -63,11 +67,15 @@ export async function getSessionServerDosen() {
         }
     });
 
-    const semester = await db.semester.findFirst({
+    let semester = await db.semester.findFirst({
         where:{
             status:true,
         }
     });
+
+    if(semester==null){
+        semester = await db.semester.findFirst();
+    }
 
     let sessionData = session?.user;
 

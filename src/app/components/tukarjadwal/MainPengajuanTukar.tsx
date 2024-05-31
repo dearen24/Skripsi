@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { getMyJadwal, getMyPengajuan, getOtherJadwal, insertPertukaran } from "../../actions/tukarjadwal"
+import { checkPendingJadwal, getMyJadwal, getMyPengajuan, getOtherJadwal, insertPertukaran } from "../../actions/tukarjadwal"
 import ItemPengajuanSaya from "./ItemPengajuanSaya";
 import { Card, Col, FormSelect, ListGroup, Row, Tab, Tabs } from "react-bootstrap";
 import ItemJadwalSaya from "./ItemJadwalSaya";
@@ -10,6 +10,9 @@ import MakePertukaranModal from "../modal/MakePertukaranConfirmation";
 import ToastSuccessMakePertukaran from "../toast/SuccessMakePertukaran";
 import ModalCannotMakePertukaran from "../modal/CannotMakePertukaran";
 import LoadingPage from "../LoadingPage";
+import ModalFailTukarPendingSaya from "../modal/FailTukarPendingSaya";
+import ModalFailTukarPendingDosenLain from "../modal/FailTukarPendingDosenLain";
+import { getDatesBySemester } from "@/app/actions/ujian";
 
 export default function MainPengajuanTukar({props}){
     const [isLoading,setLoading] = useState(true);
@@ -24,6 +27,9 @@ export default function MainPengajuanTukar({props}){
     const [selectedTipe,setSelectedTipe] = useState("UTS");
     const [modal, setModal] = useState(false);
     const [modalFailed, setModalFailed] = useState(false);
+    const [modalPendingSaya, setModalPendingSaya] = useState(false);
+    const [modalPendingDosenLain, setModalPendingDosenLain] = useState(false);
+    const [tanggal, setTanggal] = useState(new Object);
     const [toast,setToast] = useState(false);
 
     const openModal = () => {
@@ -37,6 +43,10 @@ export default function MainPengajuanTukar({props}){
 
     const closeModal = () => setModal(false);
     const closeModalFailed = () => setModalFailed(false);
+    const openModalPendingSaya = () => setModalPendingSaya(true);
+    const closeModalPendingSaya = () => setModalPendingSaya(false);
+    const openModalPendingDosenLain = () => setModalPendingDosenLain(true);
+    const closeModalPendingDosenLain = () => setModalPendingDosenLain(false);
     const openToast = () => setToast(true);
     const closeToast = () => setToast(false);
 
@@ -47,8 +57,10 @@ export default function MainPengajuanTukar({props}){
             const jadwalSaya = await getMyJadwal(session.id,session.semester);
             const jadwalDosenLain = await getOtherJadwal(session.id,session.semester);
             const semester = await getSemester();
+            const tgl = await getDatesBySemester(session.semester,"UTS");
             const arrSaya = [];
             const arrDosenLain = [];
+            console.log(tgl);
 
             for(let i = 0;i<jadwalSaya.length;i++){
                 if(jadwalSaya[i].ujian.tipe.toString()==selectedTipe){
@@ -62,6 +74,7 @@ export default function MainPengajuanTukar({props}){
                 }
             }
 
+            setTanggal(tgl);
             setSemester(semester);
             setJadwalSaya(arrSaya);
             setJadwalDosenLain(arrDosenLain);
@@ -71,14 +84,35 @@ export default function MainPengajuanTukar({props}){
     }, []);
 
     const buatPertukaran = async () => {
-        await insertPertukaran(selectedJadwalSaya,selectedJadwalDosenLain,session.semester);
-        openToast();
-        closeModal();
+        const jadwalPendingSaya = await checkPendingJadwal(selectedJadwalSaya,selectedSemester,selectedTipe);
+        const jadwalPendingDosenLain = await checkPendingJadwal(selectedJadwalDosenLain,selectedSemester,selectedTipe);
+
+        if(jadwalPendingSaya.pending1!=null||jadwalPendingSaya.pending2!=null){
+            closeModal();
+            openModalPendingSaya();
+        }
+        else if(jadwalPendingDosenLain.pending1!=null||jadwalPendingDosenLain.pending2!=null){
+            closeModal();
+            openModalPendingDosenLain();
+        }
+        else{
+            const response = await insertPertukaran(selectedJadwalSaya,selectedJadwalDosenLain,session.semester);
+            if(response){
+                openToast();
+                closeModal();
+                setSelectedJadwalSaya("");
+                setSelectedJadwalDosenLain("");
+            }
+            else{
+                alert("Gagal mengajukan pertukaran");
+            }
+        }
     }
 
     const onChangeSemester = async (e) => {
         const jadwalSayaTemp = await getMyJadwal(session.id,e.target.value);
         const jadwalDosenLainTemp = await getOtherJadwal(session.id,e.target.value);
+        const tgl = await getDatesBySemester(e.target.value,selectedTipe);
         const arrSaya = [];
         const arrDosenLain = [];
 
@@ -94,6 +128,7 @@ export default function MainPengajuanTukar({props}){
             }
         }
         
+        setTanggal(tgl);
         setSelectedSemester(e.target.value);
         setJadwalSaya(arrSaya);
         setJadwalDosenLain(arrDosenLain);
@@ -102,6 +137,7 @@ export default function MainPengajuanTukar({props}){
     const onChangeTipe = async (e) => {
         const jadwalSaya = await getMyJadwal(session.id,selectedSemester);
         const jadwalDosenLain = await getOtherJadwal(session.id,selectedSemester);
+        const tgl = await getDatesBySemester(selectedSemester,e.target.value);
         const arrSaya = [];
         const arrDosenLain = [];
 
@@ -117,6 +153,7 @@ export default function MainPengajuanTukar({props}){
             }
         }
         
+        setTanggal(tanggal);
         setSelectedTipe(e.target.value);
         setJadwalSaya(arrSaya);
         setJadwalDosenLain(arrDosenLain);
@@ -129,12 +166,12 @@ export default function MainPengajuanTukar({props}){
     return(
         <>
             <div className="table-responsive w-100">
-                <h3 className="mx-1"><strong>Pengajuan Pertukaran</strong></h3>
+                <h3 className="mx-1"><strong>Pengajuan Pertukaran Jadwal</strong></h3>
                 <div className="d-flex flex-row">
                     <div className="px-1">
                         <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
                             {semester.map((sem)=>(
-                                <option value={sem.id}>{sem.semester}</option>
+                                sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                             ))}
                         </FormSelect>
                     </div>
@@ -142,6 +179,7 @@ export default function MainPengajuanTukar({props}){
                         <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                 </div>
@@ -222,7 +260,7 @@ export default function MainPengajuanTukar({props}){
                             <ItemJadwalSaya selectedJadwalSaya={selectedJadwalSaya} setSelectedJadwalSaya={setSelectedJadwalSaya} jadwalsaya={jadwalSaya}/>
                         </Tab>
                         <Tab eventKey="jadwaldosenlain" title="Jadwal Dosen Lain">
-                            <ItemJadwalDosenLain selectedJadwalDosenLain={selectedJadwalDosenLain} setSelectedJadwalDosenLain={setSelectedJadwalDosenLain} jadwaldosenlain={jadwalDosenLain}/>
+                            <ItemJadwalDosenLain selectedJadwalDosenLain={selectedJadwalDosenLain} tanggal={tanggal} setSelectedJadwalDosenLain={setSelectedJadwalDosenLain} jadwaldosenlain={jadwalDosenLain}/>
                         </Tab>
                     </Tabs>
                 </div>
@@ -231,6 +269,8 @@ export default function MainPengajuanTukar({props}){
             <MakePertukaranModal modal={modal} closeModal={closeModal} onAction={buatPertukaran}/>
             <ModalCannotMakePertukaran modal={modalFailed} closeModal={closeModalFailed}/>
             <ToastSuccessMakePertukaran toast={toast} closeToast={closeToast}/>
+            <ModalFailTukarPendingSaya modal={modalPendingSaya} closeModal={closeModalPendingSaya}/>
+            <ModalFailTukarPendingDosenLain modal={modalPendingDosenLain} closeModal={closeModalPendingDosenLain}/>
         </>    
     )
 }

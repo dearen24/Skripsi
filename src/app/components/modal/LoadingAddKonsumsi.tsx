@@ -5,7 +5,7 @@ export default function ModalLoadingAddKonsumsi({modal,closeModal,}:any){
     return(
         <Modal show={modal} backdrop="static">
             <ModalBody>
-                <div className="d-flex flex-row align-items-center justify-content-center" style={{border:"2px solid black"}}>
+                <div className="d-flex flex-row align-items-center justify-content-center">
                     <span className="px-3">Sedang Menghitung Konsumsi</span>
                     <Spinner/>
                 </div>

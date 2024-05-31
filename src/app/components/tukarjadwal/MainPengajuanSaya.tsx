@@ -7,6 +7,7 @@ import { getSemester } from "@/app/actions/semester";
 import { Card, CardBody, Col, FormSelect, Row } from "react-bootstrap";
 import ItemPengajuanLain from "./ItemPengajuanLain";
 import LoadingPage from "../LoadingPage";
+import ToastSuccessDelete from "../toast/SuccessDelete";
 
 export default function MainPengajuanSaya({props}){
     const [isLoading,setLoading] = useState(true);
@@ -16,7 +17,11 @@ export default function MainPengajuanSaya({props}){
     const [semester, setSemester] = useState();
     const [selectedTipe, setSelectedTipe] = useState("UTS");
     const [selectedSemester, setSelectedSemester] = useState(props.semester.id);
+    const [toast, setToast] = useState(false);
     const router = useRouter();
+
+    const closeToast = () => setToast(false);
+    const openToast = () => setToast(true);
 
     useEffect(() => {
         // Fetch data on component mount
@@ -36,7 +41,7 @@ export default function MainPengajuanSaya({props}){
     const changeData = async (data) => {
         setPertukaranSaya(data);
         router.refresh();
-        //openToastTambah();
+        openToast();
     }
 
     const onChangeSemester = async (e) => {
@@ -55,9 +60,6 @@ export default function MainPengajuanSaya({props}){
         setSelectedTipe(e.target.value);
     }
 
-    console.log(pertukaranSaya);
-    // console.log(pertukaranLain);
-
     if(isLoading){
         return <LoadingPage/>
     }
@@ -67,18 +69,19 @@ export default function MainPengajuanSaya({props}){
             <div className="upper mx-1">
                 <h3><strong>Pengajuan Saya</strong></h3>
             </div>
-            <div className="d-flex flex-row my-1">
+            <div className="d-flex flex-row my-1 mx-1">
                 <div>
-                    <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
+                    <FormSelect onChange={onChangeSemester} style={{border:"2px solid black", cursor:"pointer"}}>
                         {semester.map((sem)=>(
-                            <option value={sem.id}>{sem.semester}</option>
+                            sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                         ))}
                     </FormSelect>
                 </div>
                 <div className="px-1">
-                    <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
+                    <FormSelect onChange={onChangeTipe} style={{border:"2px solid black", cursor:"pointer"}}>
                         <option value="UTS">UTS</option>
                         <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </FormSelect>
                 </div>
             </div>
@@ -117,54 +120,7 @@ export default function MainPengajuanSaya({props}){
                         null 
                 ))}
             </div>
+            <ToastSuccessDelete toastTambah={toast} closeToastTambah={closeToast} page="Pengajuan Petukaran"/>
         </div>
     )
-
-    // return(
-    //     <>
-    //         <div className="table-responsive w-100">
-    //             <h1>Pengajuan Saya</h1>
-    //             <div className="d-flex flex-row">
-    //                 <div>
-    //                     <FormSelect onChange={onChangeSemester}>
-    //                         {semester.map((sem)=>(
-    //                             <option value={sem.id}>{sem.semester}</option>
-    //                         ))}
-    //                     </FormSelect>
-    //                 </div>
-    //                 <div>
-    //                     <FormSelect onChange={onChangeTipe}>
-    //                         <option value="UTS">UTS</option>
-    //                         <option value="UAS">UAS</option>
-    //                     </FormSelect>
-    //                 </div>
-    //             </div>
-    //             <div className="table-wrapper">
-    //                 <table className="table table-hover align-middle">
-    //                     <thead className="table-dark">
-    //                         <tr className="">    
-    //                             <th className="text-center" style={{borderTopLeftRadius:'6px'}}>Dari</th>
-    //                             <th className="text-center"></th>					
-    //                             <th className="text-center">Ke</th>
-    //                             <th className="text-center">Status</th>
-    //                             <th className="text-center" style={{borderTopRightRadius:'6px'}}>Action</th>
-    //                         </tr>
-    //                     </thead>
-    //                     {pertukaranSaya.map((item)=>(
-    //                         item.pertukaran.statusDosen2!="Disetujui"&&item.pertukaran.statusAdmin!="Disetujui" ?
-    //                             <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
-    //                         :
-    //                            null 
-    //                     ))}
-    //                     {pertukaranLain.map((item)=>(
-    //                         item.pertukaran.statusDosen2=="Disetujui"&&item.pertukaran.statusAdmin=="Disetujui" ?
-    //                             <ItemPengajuanSaya item={item} pertukaran={pertukaranSaya} setPertukaran={changeData}/>
-    //                         :
-    //                            null 
-    //                     ))}
-    //                 </table>
-    //             </div>
-    //         </div>
-    //     </>    
-    // )
 }

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { getAllJadwal, insertPertukaran, tukarJadwal} from "../../actions/tukarjadwal";
+import { getAllJadwal, insertPertukaran, insertPertukaranAdmin, tukarJadwal} from "../../actions/tukarjadwal";
 import { Card, Col, FormSelect, ListGroup, Row, Tab, Tabs } from "react-bootstrap";
 import ItemJadwalDosenAdmin from "./ItemJadwalDosenAdmin";
 import ItemJadwalDosenLain from "./ItemJadwalDosenLain";
@@ -76,10 +76,13 @@ export default function MainPengajuanTukarAdmin({props}){
         const indexDosen1 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen1);
         const indexDosen2 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen2);
         if(indexDosen1!=-1&&indexDosen2!=-1){
-            const response = await tukarJadwal(selectedJadwalDosen1,jadwalDosen1[indexDosen1].idDosen,selectedJadwalDosen2,jadwalDosen2[indexDosen2].idDosen,session.semester,true);
-            if(response){
+            const response1 = await insertPertukaranAdmin(selectedJadwalDosen1,selectedJadwalDosen2,session.semester);
+            const response2 = await tukarJadwal(selectedJadwalDosen1,jadwalDosen1[indexDosen1].idDosen,selectedJadwalDosen2,jadwalDosen2[indexDosen2].idDosen,session.semester,true);
+            if(response1&&response2){
                 openToast();
                 closeModal();
+                setSelectedJadwalDosen1("");
+                setSelectedJadwalDosen2("");
             }
             else{
                 alert("gagal membuat pertukaran"); 
@@ -94,10 +97,13 @@ export default function MainPengajuanTukarAdmin({props}){
         const indexDosen1 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen1);
         const indexDosen2 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen2);
         if(indexDosen1!=-1&&indexDosen2!=-1){
-            const response = await tukarJadwal(selectedJadwalDosen1,jadwalDosen1[indexDosen1].idDosen,selectedJadwalDosen2,jadwalDosen2[indexDosen2].idDosen,session.semester,true);
-            if(response){
+            const response1 = await insertPertukaranAdmin(selectedJadwalDosen1,selectedJadwalDosen2,session.semester);
+            const response2 = await tukarJadwal(selectedJadwalDosen1,jadwalDosen1[indexDosen1].idDosen,selectedJadwalDosen2,jadwalDosen2[indexDosen2].idDosen,session.semester,true);
+            if(response1&&response2){
                 openToast();
                 closeModal();
+                setSelectedJadwalDosen1("");
+                setSelectedJadwalDosen2("");
             }
             else{
                 alert("gagal membuat pertukaran"); 
@@ -114,8 +120,10 @@ export default function MainPengajuanTukarAdmin({props}){
         const date = await getDatesBySemester(e.target.value,selectedTipe);
 
         setDates(date);
-        setSelectedDateDosen1(date[0].date.toISOString());
-        setSelectedDateDosen2(date[0].date.toISOString());
+        if(date.length!=0){
+            setSelectedDateDosen1(date[0].date.toISOString());
+            setSelectedDateDosen2(date[0].date.toISOString());
+        }
         setSelectedSemester(e.target.value);
         setJadwalDosen1(jadwalDosen1Temp);
         setJadwalDosen2(jadwalDosen2Temp);
@@ -127,8 +135,10 @@ export default function MainPengajuanTukarAdmin({props}){
         const date = await getDatesBySemester(selectedSemester,e.target.value);
 
         setDates(date);
-        setSelectedDateDosen1(date[0].date.toISOString());
-        setSelectedDateDosen2(date[0].date.toISOString());
+        if(date.length!=0){
+            setSelectedDateDosen1(date[0].date.toISOString());
+            setSelectedDateDosen2(date[0].date.toISOString());
+        }
         setSelectedTipe(e.target.value);
         setJadwalDosen1(jadwalDosen1Temp);
         setJadwalDosen2(jadwalDosen2Temp);
@@ -155,6 +165,7 @@ export default function MainPengajuanTukarAdmin({props}){
                         <FormSelect onChange={onChangeTipe} style={{border:"2px solid black"}}>
                             <option value="UTS">UTS</option>
                             <option value="UAS">UAS</option>
+                            <option value="Pendek">Pendek</option>
                         </FormSelect>
                     </div>
                 </div>

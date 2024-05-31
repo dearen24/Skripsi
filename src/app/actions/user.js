@@ -18,6 +18,9 @@ export async function getUserById(idUser){
         },
         include:{
             role: true,
+            dosenMengajar:true,
+            mengawas:true,
+            rekapMengawas:true,
         }
     });
 

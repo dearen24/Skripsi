@@ -11,7 +11,7 @@ const GoogleSignInButton = () => {
 
     return(
         <>  
-            <button className="btn" onClick={handleClick}>
+            <button className="btn" onClick={handleClick} >
                 <img src="web_light_rd_SI.svg"/>
             </button>
         </>

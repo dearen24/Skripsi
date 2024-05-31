@@ -169,15 +169,15 @@ export default function EditUjian({params,props}){
                             <div className="form-group w-50">
                                 <label>Tipe Ujian</label>
                                 <select className="form-control" name="tipeujian" style={{border:"2px solid black"}}>
-                                    {ujian.tipe == "UTS" ? <><option value="UTS" selected>UTS</option><option value="UAS">UAS</option></> 
-                                    : <><option value="UTS">UTS</option><option value="UAS" selected>UAS</option></>}
+                                    {ujian.tipe == "UTS" ? <option value="UTS" selected>UTS</option> : <option value="UTS">UTS</option>}
+                                    {ujian.tipe == "UAS" ? <option value="UAS" selected>UAS</option> : <option value="UAS">UAS</option>}
+                                    {ujian.tipe == "Pendek" ? <option value="Pendek" selected>Pendek</option> : <option value="Pendek">Pendek</option>}
                                 </select>
                             </div>
                             <div className="form-group w-50">
                                 <label>Metode Ujian</label>
                                 <select className="form-control" name="metodeujian" style={{border:"2px solid black"}}>
                                     {ujian.metode == "Luring" ? <option value="Luring" selected>Luring</option> : <option value="Luring">Luring</option>}
-                                    {ujian.metode == "Daring" ? <option value="Daring" selected>Daring</option> : <option value="Daring">Daring</option>}
                                     {ujian.metode == "Proyek" ? <option value="Proyek" selected>Proyek</option> : <option value="Proyek">Proyek</option>}
                                     {ujian.metode == "Presentasi" ? <option value="Presentasi" selected>Presentasi</option> : <option value="Presentasi">Presentasi</option>}
                                 </select>

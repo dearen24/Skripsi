@@ -10,6 +10,9 @@ export async function getJabatanById(id){
     const role = await db.role.findFirst({
         where:{
             id:String(id)
+        },
+        include:{
+            users:true
         }
     });
 

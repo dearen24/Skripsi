@@ -16,6 +16,7 @@ export default function MainJadwal({props}){
     const [jadwal, setJadwal] = useState(new Object);
     const [semester, setSemester] = useState(new Object);
     const [selectedData, setSelectedData] = useState({semester:props.semester.id,tipe:"UTS"});
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         // Fetch data on component mount
@@ -184,6 +185,10 @@ export default function MainJadwal({props}){
 
         setJadwal(arr);
     }
+
+    const changeSearch = (e) => {
+        setSearch(e.target.value);
+    }
     
     if(isLoading){
         return <LoadingPage/>
@@ -192,29 +197,30 @@ export default function MainJadwal({props}){
     return(
         <>
             <div className="table-responsive w-100">
-                <h3 className="mx-1"><strong>Jadwal Dosen</strong></h3>
+                <h3 className="mx-1"><strong>Jadwal Mengawas</strong></h3>
                 <div className="table-wrapper">
                     <div className="d-flex flex-row my-1 mx-1">
                         <div className="dropdown">
-                            <Form.Select onChange={handleChangeSemester} aria-label="Semester" style={{border:"2px solid black"}}>
+                            <Form.Select onChange={handleChangeSemester} aria-label="Semester" style={{border:"2px solid black", cursor:"pointer"}}>
                                 {semester.map((sem)=>(
                                     sem.id==props.semester.id ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                                 ))}
                             </Form.Select>
                         </div>
                         <div className="dropdown mx-1">
-                            <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian" style={{border:"2px solid black"}}>
+                            <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian" style={{border:"2px solid black", cursor:"pointer"}}>
                                 <option value="UTS" selected>UTS</option>
                                 <option value="UAS">UAS</option>
                             </Form.Select>
                         </div>
+                        <input className="form-control w-25 mb-1" placeholder="Search" onChange={changeSearch} style={{border:"2px solid black"}}/>
                     </div>
                 {jadwal.map((data)=>(
                     <Accordion className="mx-1 my-1" style={{border:"2px solid black",borderRadius:"8px"}}>
                         <Accordion.Item eventKey="0">
                             <Accordion.Header><strong>{String(data[0].date).split(" ")[0]+", "+String(data[0].date).split(" ")[1]+" "+String(data[0].date).split(" ")[2]+" "+String(data[0].date).split(" ")[3]}</strong></Accordion.Header>
-                            <Accordion.Body>
-                                <ItemJadwal data={data}/>
+                                <Accordion.Body> 
+                                <ItemJadwal data={data} search={search}/>
                             </Accordion.Body>
                         </Accordion.Item>
                     </Accordion>

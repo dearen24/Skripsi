@@ -6,10 +6,11 @@ import LoadingPengguna from "../../admin/dosen/loading";
 import { Card, CardBody, Col, Form, Row } from "react-bootstrap";
 import { getUser } from "@/app/actions/user";
 import Image from "next/image";
-import { getSemester } from "@/app/actions/semester";
+import { getSemester, getSemesterById, getSemesterByNama } from "@/app/actions/semester";
 import ItemPengawas from "./ItemPengawas";
 import ToastSuccessEdit from "../toast/SuccessEdit";
 import LoadingPage from "../LoadingPage";
+import { getRekapMengawas } from "@/app/actions/rekapmengawas";
 
 export default function MainPengawas({props}){
     const [isLoading,setLoading] = useState(true);
@@ -20,6 +21,7 @@ export default function MainPengawas({props}){
     const [hiddenAndDisabled, setHiddenAndDisabled] = useState(true);
     const [date, setDate] = useState(new Object);
     const [toast, setToast] = useState(false);
+    const [namaSemester,setNamaSemester] = useState();
 
     const openToast = () => setToast(true);
     const closeToast = () => setToast(false);
@@ -29,9 +31,40 @@ export default function MainPengawas({props}){
     const fetchData = async () => {
         try {
             const ujian = await getUjianBySemester(props.semester.id,"UTS");
-            // const ujian = await getUjian();
             const dosen = await getUser();
             const semester = await getSemester();
+            const semesterSelected = await getSemesterById(props.semester.id);
+            let namaSemester = String(semesterSelected?.semester);
+            let ganjilGenap = String(namaSemester.substring(0,6));
+            let rekapMengawasSebelumnya = [];
+
+            if(ganjilGenap.includes("Ganjil")){
+                let tahunAjaran1 = Number(namaSemester.substring(7,11))-1;
+                let tahunAjaran2 = tahunAjaran1+1;
+                let semesterSebelumnya = "Genap "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+                const lastSemester = await getSemesterByNama(semesterSebelumnya);
+                if(lastSemester!=null){
+                    rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+                }
+            }
+            else if(ganjilGenap.includes("Genap")){
+                let tahunAjaran1 = Number(namaSemester.substring(6,10));
+                let tahunAjaran2 = tahunAjaran1+1;
+                let semesterSebelumnya = "Ganjil "+String(Number(tahunAjaran1))+"/"+String(Number(tahunAjaran2));
+                const lastSemester = await getSemesterByNama(semesterSebelumnya);
+                if(lastSemester!=null){
+                    rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+                }
+            }
+
+            if(rekapMengawasSebelumnya.length!=0){
+                for(let i = 0;i<dosenTemp.length;i++){
+                    const index = rekapMengawasSebelumnya.findIndex(a=>a.idDosen==dosenTemp[i].id);
+                    if(index!=-1){
+                        dosenTemp[i].role.kuotaMengawas = rekapMengawasSebelumnya[index].kuotaSelanjutnya;
+                    }
+                }
+            }
             
             for(let i = 0;i<ujian.length;i++){
                 ujian[i].ruangandosen = [];
@@ -83,6 +116,7 @@ export default function MainPengawas({props}){
                 }
             }
 
+            setNamaSemester(props.semester.semester);
             setSelectedData({date:ujianDate[0].toISOString(),tipe:"UTS",semester:props.semester.id});
             setDate(ujianDate);
             setSemester(semester);
@@ -148,6 +182,56 @@ export default function MainPengawas({props}){
         dataTemp.semester = e.target.value;
         const dosenTemp = await getUser();
         const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const semesterSelected = await getSemesterById(e.target.value);
+        let namaSemester = String(semesterSelected?.semester);
+        let ganjilGenap = String(namaSemester.substring(0,6));
+        let rekapMengawasSebelumnya = [];
+
+        if(ganjilGenap.includes("Ganjil")&&dataTemp.tipe=="UTS"){
+            let tahunAjaran1 = Number(namaSemester.substring(7,11))-1;
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Genap "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+            }
+        }
+        else if(ganjilGenap.includes("Ganjil")&&dataTemp.tipe=="UAS"){
+            let tahunAjaran1 = Number(namaSemester.substring(7,11));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Ganjil "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UTS");
+            }
+        }
+        else if(ganjilGenap.includes("Genap")&&dataTemp.tipe=="UTS"){
+            let tahunAjaran1 = Number(namaSemester.substring(6,10));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Ganjil "+String(Number(tahunAjaran1))+"/"+String(Number(tahunAjaran2));
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+            }
+        }
+        else if(ganjilGenap.includes("Genap")&&dataTemp.tipe=="UAS"){
+            let tahunAjaran1 = Number(namaSemester.substring(6,10));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Genap "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UTS");
+            }
+        }
+
+        if(rekapMengawasSebelumnya.length!=0){
+            for(let i = 0;i<dosenTemp.length;i++){
+                const index = rekapMengawasSebelumnya.findIndex(a=>a.idDosen==dosenTemp[i].id);
+                if(index!=-1){
+                    dosenTemp[i].role.kuotaMengawas = rekapMengawasSebelumnya[index].kuotaSelanjutnya;
+                }
+            }
+        }
 
         for(let i = 0;i<ujianTemp.length;i++){
             ujianTemp[i].ruangandosen = [];
@@ -203,6 +287,7 @@ export default function MainPengawas({props}){
             dataTemp.date = ujianDate[0].toISOString();
         }
         
+        setNamaSemester(semesterSelected.semester);
         setSelectedData(dataTemp);
         setDate(ujianDate);
         setDosen(dosenTemp);
@@ -214,6 +299,56 @@ export default function MainPengawas({props}){
         dataTemp.tipe = e.target.value;
         const dosenTemp = await getUser();
         const ujianTemp = await getUjianBySemester(dataTemp.semester,dataTemp.tipe);
+        const semesterSelected = await getSemesterById(e.target.value);
+        let namaSemester = String(semesterSelected?.semester);
+        let ganjilGenap = String(namaSemester.substring(0,6));
+        let rekapMengawasSebelumnya = [];
+
+        if(ganjilGenap.includes("Ganjil")&&dataTemp.tipe=="UTS"){
+            let tahunAjaran1 = Number(namaSemester.substring(7,11))-1;
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Genap "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+            }
+        }
+        else if(ganjilGenap.includes("Ganjil")&&dataTemp.tipe=="UAS"){
+            let tahunAjaran1 = Number(namaSemester.substring(7,11));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Ganjil "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UTS");
+            }
+        }
+        else if(ganjilGenap.includes("Genap")&&dataTemp.tipe=="UTS"){
+            let tahunAjaran1 = Number(namaSemester.substring(6,10));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Ganjil "+String(Number(tahunAjaran1))+"/"+String(Number(tahunAjaran2));
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UAS");
+            }
+        }
+        else if(ganjilGenap.includes("Genap")&&dataTemp.tipe=="UAS"){
+            let tahunAjaran1 = Number(namaSemester.substring(6,10));
+            let tahunAjaran2 = tahunAjaran1+1;
+            let semesterSebelumnya = "Genap "+String(tahunAjaran1)+"/"+String(tahunAjaran2);
+            const lastSemester = await getSemesterByNama(semesterSebelumnya);
+            if(lastSemester!=null){
+                rekapMengawasSebelumnya = await getRekapMengawas(lastSemester.id,"UTS");
+            }
+        }
+
+        if(rekapMengawasSebelumnya.length!=0){
+            for(let i = 0;i<dosenTemp.length;i++){
+                const index = rekapMengawasSebelumnya.findIndex(a=>a.idDosen==dosenTemp[i].id);
+                if(index!=-1){
+                    dosenTemp[i].role.kuotaMengawas = rekapMengawasSebelumnya[index].kuotaSelanjutnya;
+                }
+            }
+        }
 
         for(let i = 0;i<ujianTemp.length;i++){
             ujianTemp[i].ruangandosen = [];
@@ -300,8 +435,9 @@ export default function MainPengawas({props}){
                 </div>
                 <div className="dropdown">
                     <Form.Select onChange={handleChangeTipe} aria-label="Masa Ujian" style={{border:"2px solid black"}}>
-                        <option selected>UTS</option>
-                        <option>UAS</option>
+                        <option value="UTS" selected>UTS</option>
+                        <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </Form.Select>
                 </div>
                 <div className="mx-1">
@@ -328,7 +464,7 @@ export default function MainPengawas({props}){
                             <Col>
                                 <strong>Metode</strong>
                             </Col>
-                            <Col>
+                            <Col sm="1">
                                 <strong>Shift</strong>
                             </Col>
                             <Col>
@@ -340,11 +476,8 @@ export default function MainPengawas({props}){
                             <Col>
                                 <strong>Dosen Pengajar</strong>
                             </Col>
-                            <Col>
+                            <Col sm="3">
                                 <strong>Pengawas</strong>
-                            </Col>
-                            <Col>
-                                <strong>Tambah Pengawas</strong>
                             </Col>
                         </Row>
                     </CardBody>
@@ -358,7 +491,7 @@ export default function MainPengawas({props}){
                     null
                 ))}
             </div>
-            <button type="submit" className="btn btn-warning w-100 my-2" onClick={edit} hidden={hiddenAndDisabled}>
+            <button type="submit" className="btn btn-warning my-2 mx-1" style={{border:"2px solid black"}} onClick={edit} hidden={hiddenAndDisabled}>
                 <Image src="/floppy-fill-black.svg" alt="Edit" width={20} height={20} className="mx-2"/>
                 Simpan Perubahan
             </button> 

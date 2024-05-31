@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {getUjian, getUjianBySemester} from "../../actions/ujian";
+import {getUjian, getUjianBySemester, makeUjianByExcel} from "../../actions/ujian";
 import ItemUjian from "./ItemUjian";
 import { Card, CardBody, Col, FormSelect, Row } from "react-bootstrap";
 import { getSemester } from "@/app/actions/semester";
 import LoadingPage from "../LoadingPage";
 import ToastSuccessDelete from "../toast/SuccessDelete";
+import * as XLSX from 'xlsx';
+import ImportUjianExcelModal from "../modal/ImportUjianExcel";
 
 export default function MainUjian({props}){
     const [isLoading,setLoading] = useState(true);
@@ -15,8 +17,12 @@ export default function MainUjian({props}){
     const [semester, setSemester] = useState(new Object);
     const [toastTambah,setToastTambah] = useState(false);
     const [selectedData,setSelectedData] = useState(new Object);
+    const [excelFile, setExcelFile] = useState(null);
+    const [modal, setModal] = useState(false);
     const router = useRouter();
 
+    const closeModal = () => setModal(false);
+    const openModal = () => setModal(true);
     const closeToastTambah = () => setToastTambah(false);
     const openToastTambah = () => setToastTambah(true);
 
@@ -166,6 +172,7 @@ export default function MainUjian({props}){
                     <FormSelect onChange={handleChangeTipe} style={{border:"2px solid black"}}>
                         <option value="UTS">UTS</option>
                         <option value="UAS">UAS</option>
+                        <option value="Pendek">Pendek</option>
                     </FormSelect>
                 </div>
                 <div className="px-1">
@@ -178,6 +185,7 @@ export default function MainUjian({props}){
                         ))}
                     </FormSelect>
                 </div>
+                <button className="btn btn-dark my-1" onClick={openModal} style={{backgroundColor:"#272829"}}><strong>Import Ujian</strong></button>
             </div>
             <div className="content mx-1">
                 <Card style={{backgroundColor:"#272829",color:"white"}}>
@@ -217,6 +225,7 @@ export default function MainUjian({props}){
                 ))}
             </div>
             <ToastSuccessDelete toastTambah={toastTambah} closeToastTambah={closeToastTambah} page={"Ujian"}/>
+            <ImportUjianExcelModal modal={modal} closeModal={closeModal}/>
         </div>
     )
 
