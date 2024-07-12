@@ -154,7 +154,7 @@ export default function MainGantiJadwal({props}){
                     <div className="px-1">
                         <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
                             {semester.map((sem)=>(
-                                <option value={sem.id}>{sem.semester}</option>
+                                sem.id==selectedSemester ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                             ))}
                         </FormSelect>
                     </div>
@@ -204,7 +204,7 @@ export default function MainGantiJadwal({props}){
                         <Card className="px-2" style={{border:"2px solid black"}}>
                             <Row className="align-items-center">
                                     <Col md="auto">
-                                        <h6 className="my-2">Dosen Menggantikan:</h6>
+                                        <h6 className="my-2">Pengawas Menggantikan:</h6>
                                     </Col>
                                     {dosen.map((d)=>(
                                         selectedDosen == d.id ?

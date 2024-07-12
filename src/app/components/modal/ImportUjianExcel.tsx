@@ -1,14 +1,16 @@
 "use client"
 import { makeUjianByExcel } from "@/app/actions/ujian";
 import { useState } from "react";
-import { Form, Modal } from "react-bootstrap";
+import { Col, Form, FormSelect, Modal, Row } from "react-bootstrap";
 import * as XLSX from 'xlsx';
 import ModalSuccessAdd from "./SuccessAdd";
 import ToastSuccessAdd from "../toast/SuccessAdd";
 
-export default function ImportUjianExcelModal({modal,closeModal}:any){
+export default function ImportUjianExcelModal({modal,closeModal,semester}:any){
     const [excelFile, setExcelFile] = useState(null);
     const [toast, setToast] = useState(false);    
+    const [selectedSemester, setSelectedSemester] = useState(semester[0].id);
+    const [selectedTipe, setSelectedTipe] = useState("UTS");
 
     const closeToast = () => setToast(false);
     const openToast = () => setToast(true);
@@ -109,9 +111,7 @@ export default function ImportUjianExcelModal({modal,closeModal}:any){
                 }
             }
             
-            const semester = "deba130f-75bf-40fe-896a-fd93b853b54d";
-            const masaujian = "Pendek";
-            const response = await makeUjianByExcel(semester,masaujian,arrData);
+            const response = await makeUjianByExcel(selectedSemester,selectedTipe,arrData);
             if(!response){
                 alert("Gagal");
             }
@@ -121,6 +121,15 @@ export default function ImportUjianExcelModal({modal,closeModal}:any){
         }
     }
 
+    const handleChangeSemester = (e) => {
+        setSelectedSemester(e.target.value);
+    }
+
+    const handleChangeTipe = (e) => {
+        setSelectedTipe(e.target.value);
+    }
+
+
     return(
         <>
             <Modal show={modal} onHide={closeModal}>
@@ -128,8 +137,25 @@ export default function ImportUjianExcelModal({modal,closeModal}:any){
                     <Modal.Title>Konfirmasi</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    <Row>
+                        <Form.Label>Pilih Semester dan Masa Ujian yang ingin di-impor!</Form.Label>
+                        <Col>
+                            <FormSelect onChange={handleChangeSemester} style={{border:"2px solid black"}}>
+                                {semester.map((sem)=>(
+                                sem.id==selectedSemester ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
+                            ))}
+                            </FormSelect>
+                        </Col>
+                        <Col>
+                            <FormSelect onChange={handleChangeTipe} style={{border:"2px solid black"}}>
+                                <option value="UTS">UTS</option>
+                                <option value="UAS">UAS</option>
+                                <option value="Pendek">Pendek</option>
+                            </FormSelect>
+                        </Col>
+                    </Row>
                     <Form.Label>Masukan File Excel</Form.Label>
-                    <Form.Control type="file" onChange={submitExcel}/>
+                    <Form.Control type="file" onChange={submitExcel} style={{border:"2px solid black"}}/>
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="btn btn-danger" onClick={closeModal} style={{border:"2px solid black"}}>

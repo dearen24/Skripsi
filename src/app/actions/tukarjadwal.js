@@ -1,4 +1,5 @@
 "use server"
+import { date } from 'zod';
 import db from '../../modules/db'
 import { getAllExamDateDosen, addKonsumsiDosen } from './konsumsi';
 
@@ -362,7 +363,34 @@ export async function rejectPertukaranAdmin(id){
 export async function tukarJadwal(idJadwal1,idDosen1,idJadwal2,idDosen2,status){
     try{
         if(status){
-            //tuker dosen dan set konsumsi jadi 0
+            
+            const date1 = await db.examRoomLec.findFirst({//ambil tanggal jadwal1
+                select:{
+                    ujian:{
+                        select:{
+                            date:true,
+                        }
+                    },
+                },
+                where:{
+                    id:idJadwal1
+                }
+            });
+
+            const date2 = await db.examRoomLec.findFirst({// ambil tanggal jadwal2
+                select:{
+                    ujian:{
+                        select:{
+                            date:true,
+                        }
+                    },
+                },
+                where:{
+                    id:idJadwal2
+                }
+            });
+        
+            // tuker dosen dan set konsumsi jadi 0
             await db.examRoomLec.update({//ujian ini jadi punya dosen2
                 where:{
                     id:String(idJadwal1),
@@ -384,6 +412,30 @@ export async function tukarJadwal(idJadwal1,idDosen1,idJadwal2,idDosen2,status){
                     lunch:0
                 }
             })
+
+            const ujianDosen1Sebelumnya = await db.examRoomLec.findFirst({
+                where:{
+                    idDosen:idDosen1,
+                    ujian:{
+                        date:date1.ujian.date
+                    }
+                },
+                include:{
+                    ujian:true,
+                }
+            });
+
+            const ujianDosen2Sebelumnya = await db.examRoomLec.findFirst({
+                where:{
+                    idDosen:idDosen2,
+                    ujian:{
+                        date:date2.ujian.date
+                    }
+                },
+                include:{
+                    ujian:true,
+                }
+            });
 
             const ujianDosen1 = await db.examRoomLec.findFirst({
                 where:{
@@ -407,6 +459,8 @@ export async function tukarJadwal(idJadwal1,idDosen1,idJadwal2,idDosen2,status){
             const aturan = await db.rules.findMany();
             const arrAturan = [];
             const arrDosen = [ujianDosen1,ujianDosen2];
+            if(ujianDosen1Sebelumnya!=null)arrDosen.push(ujianDosen1Sebelumnya);
+            if(ujianDosen2Sebelumnya!=null)arrDosen.push(ujianDosen2Sebelumnya);
             for(let i = 0;i<aturan.length;i++){//ambil dan masukin aturanya
                 arrAturan.push({delapanSepuluh:aturan[i].delapanSepuluh,sepuluhDuaBelas:aturan[i].sepuluhDuaBelas,sebelasTigaBelas:aturan[i].sebelasTigaBelas,duaBelasDua:aturan[i].duaBelasDua,duaEmpat:aturan[i].duaEmpat});
             }

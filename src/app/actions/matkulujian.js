@@ -43,10 +43,11 @@ export async function getMatkulujianById(id){
     return matkulujian;
 }
 
-export async function getMatkulujianByMatkulId(id){
+export async function getMatkulujianByMatkulId(id,semester){
     const matkulujian = await db.examSubject.findFirst({
         where:{
-            idMatkul:String(id)
+            idMatkul:String(id),
+            idSemester:semester
         },
         include:{
             dosenPengajar: true,

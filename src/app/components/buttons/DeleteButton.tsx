@@ -151,27 +151,21 @@ export function DeleteButton(props){
             }
         }
         else if(props.page=="Ujian"){
-            const ujian = await getUjianById(props.idUjian);
-            if(ujian?.ujian.length!=0){
-                openModalFailed();
-            }
-            else{
-                const response = await deleteUjian(props.idUjian);
-                for(let i = 0;i<props.ujian.length;i++){
-                    for(let j = 0;j<props.ujian[i].length;j++){
-                        if(props.ujian[i][j]!=undefined){
-                            if(props.ujian[i][j].id==props.idUjian){
-                                props.ujian[i].splice(j,1);
-                            }
+            const response = await deleteUjian(props.idUjian);
+            for(let i = 0;i<props.ujian.length;i++){
+                for(let j = 0;j<props.ujian[i].length;j++){
+                    if(props.ujian[i][j]!=undefined){
+                        if(props.ujian[i][j].id==props.idUjian){
+                            props.ujian[i].splice(j,1);
                         }
                     }
                 }
-                if(response==true){
-                    props.setUjian(props.ujian);
-                }
-                else{
-                    alert("Gagal Menghapus Ujian");
-                }
+            }
+            if(response==true){
+                props.setUjian(props.ujian);
+            }
+            else{
+                alert("Gagal Menghapus Ujian");
             }
         }
         else if(props.page=="Aturan Konsumsi"){

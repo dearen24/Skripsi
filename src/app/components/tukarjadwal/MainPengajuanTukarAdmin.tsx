@@ -97,9 +97,9 @@ export default function MainPengajuanTukarAdmin({props}){
         const indexDosen1 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen1);
         const indexDosen2 = jadwalDosen1.findIndex(a=>a.id==selectedJadwalDosen2);
         if(indexDosen1!=-1&&indexDosen2!=-1){
-            const response1 = await insertPertukaranAdmin(selectedJadwalDosen1,selectedJadwalDosen2,session.semester);
+            // const response1 = await insertPertukaranAdmin(selectedJadwalDosen1,selectedJadwalDosen2,session.semester);
             const response2 = await tukarJadwal(selectedJadwalDosen1,jadwalDosen1[indexDosen1].idDosen,selectedJadwalDosen2,jadwalDosen2[indexDosen2].idDosen,session.semester,true);
-            if(response1&&response2){
+            if(true&&response2){
                 openToast();
                 closeModal();
                 setSelectedJadwalDosen1("");
@@ -116,7 +116,7 @@ export default function MainPengajuanTukarAdmin({props}){
 
     const onChangeSemester = async (e) => {
         const jadwalDosen1Temp = await getAllJadwal(e.target.value,selectedTipe.value);
-        const jadwalDosen2Temp = await getAllJadwal(selectedSemester,selectedTipe.value);
+        const jadwalDosen2Temp = await getAllJadwal(e.target.value,selectedTipe.value);
         const date = await getDatesBySemester(e.target.value,selectedTipe);
 
         setDates(date);
@@ -157,7 +157,7 @@ export default function MainPengajuanTukarAdmin({props}){
                     <div className="px-1">
                         <FormSelect onChange={onChangeSemester} style={{border:"2px solid black"}}>
                             {semester.map((sem)=>(
-                                <option value={sem.id}>{sem.semester}</option>
+                                sem.id==selectedSemester ? <option value={sem.id} selected>{sem.semester}</option> : <option value={sem.id}>{sem.semester}</option>
                             ))}
                         </FormSelect>
                     </div>

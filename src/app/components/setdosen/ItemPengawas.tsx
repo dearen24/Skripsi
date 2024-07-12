@@ -26,7 +26,7 @@ const ItemPengawas = (props) => {
 
                 const arrDosenPengajar = [];
                 for(let i = 0;i<props.ujian.matkul.length;i++){
-                    const data = await getMatkulujianByMatkulId(props.ujian.matkul[i].id);
+                    const data = await getMatkulujianByMatkulId(props.ujian.matkul[i].id,props.ujian.idSemester);
                     arrDosenPengajar.push(data);
                 }
 

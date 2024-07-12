@@ -133,7 +133,8 @@ export default function HitungKonsumsi({props}){
             const aturan = await getAturanKonsumsi();
             const arrAturan = [];
             for(let i = 0;i<aturan.length;i++){//ambil dan masukin aturanya
-                arrAturan.push({delapanSepuluh:aturan[i].delapanSepuluh,sepuluhDuaBelas:aturan[i].sepuluhDuaBelas,sebelasTigaBelas:aturan[i].sebelasTigaBelas,duaBelasDua:aturan[i].duaBelasDua,duaEmpat:aturan[i].duaEmpat});
+                arrAturan.push({delapanSepuluh:aturan[i].delapanSepuluh,sepuluhDuaBelas:aturan[i].sepuluhDuaBelas,
+                    sebelasTigaBelas:aturan[i].sebelasTigaBelas,duaBelasDua:aturan[i].duaBelasDua,duaEmpat:aturan[i].duaEmpat});
             }
     
             for(let i = 0;i<ujian.length;i++){//loop buat semua ujian yang ada buat semester dan masa ujian tersebut

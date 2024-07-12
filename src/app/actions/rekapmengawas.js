@@ -95,7 +95,7 @@ export async function createRekapMengawas(semester,masaujian){
         if(rekapMengawasSebelumnya.length!=0){
             for(let i = 0;i<dosen.length;i++){
                 const index = rekapMengawasSebelumnya.findIndex(a=>a.idDosen==dosen[i].id);
-                if(index!=-1){
+                if(index!=-1&&(dosen[i].role.nama!="DLB"||dosen[i].role.nama!="Admin")){
                     dosen[i].role.kuotaMengawas = rekapMengawasSebelumnya[index].kuotaSelanjutnya;
                 }
             }

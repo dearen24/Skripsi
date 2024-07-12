@@ -86,6 +86,7 @@ export async function getSessionServerDosen() {
     }
     //tambahin juga buat semester yang lagi aktifnya abistu di pagenya diambil datanya dan di pass ke komponennya.
     //mungkin bisa juga functionya dipisah per role 
+    // if(!session||sessionData.role=="Admin"){
     if(!session){
         return redirect("/");
     }

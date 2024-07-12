@@ -1,9 +1,12 @@
 {
+  "/page": "app/page.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/admin/ujian/page": "app/admin/ujian/page.js",
+  "/dosen/jadwal/page": "app/dosen/jadwal/page.js",
+  "/dosen/pengajuansaya/page": "app/dosen/pengajuansaya/page.js",
+  "/admin/rekapmengawas/page": "app/admin/rekapmengawas/page.js",
+  "/dosen/pengajuanlain/page": "app/dosen/pengajuanlain/page.js",
   "/dosen/pengajuantukar/page": "app/dosen/pengajuantukar/page.js",
-  "/admin/matkulujian/add/page": "app/admin/matkulujian/add/page.js",
-  "/admin/matkulujian/page": "app/admin/matkulujian/page.js",
-  "/admin/matkul/page": "app/admin/matkul/page.js"
+  "/admin/ujian/page": "app/admin/ujian/page.js",
+  "/admin/pertukarandosen/page": "app/admin/pertukarandosen/page.js",
+  "/admin/konsumsi/page": "app/admin/konsumsi/page.js"
 }

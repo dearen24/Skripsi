@@ -119,7 +119,13 @@ export async function getUjianById(id){
 
 export async function deleteUjian(id){
     try{
-        const ujian = await db.exam.delete({
+        await db.examRoomLec.deleteMany({
+            where:{
+                idUjian:String(id)
+            }
+        });
+
+        await db.exam.delete({
             where:{
                 id:String(id)
             },

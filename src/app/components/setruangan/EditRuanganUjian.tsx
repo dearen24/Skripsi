@@ -163,7 +163,7 @@ export default function EditRuanganUjian({params}){
         <>  
             <div className="mx-1">
                 <div>
-                    <h3><strong>Ubah Ujian</strong></h3>
+                    <h3><strong>Atur Ruangan Ujian</strong></h3>
                 </div>
                 <form id="form" action={edit}>
                 <div className="d-flex flex-row w-100">
@@ -184,7 +184,7 @@ export default function EditRuanganUjian({params}){
                                 <label>Waktu Selesai</label>
                                 <input className="form-control" name="waktuselesai" type="time" defaultValue={ujian.selesai.toTimeString().substring(0,5)} readOnly style={{border:"2px solid black"}}/>
                             </div>
-                            <div className="form-group w-50 my-2">
+                            <div className="form-group w-50 my-2 d-flex flex-column">
                                 <label>Kapasitas Ruangan : <strong>{totalKapasitas}</strong></label>
                                 <label>Peserta Mata Kuliah : <strong>{totalPeserta}</strong></label>
                             </div>

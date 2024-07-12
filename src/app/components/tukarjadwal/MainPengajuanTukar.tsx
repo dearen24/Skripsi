@@ -31,6 +31,7 @@ export default function MainPengajuanTukar({props}){
     const [modalPendingDosenLain, setModalPendingDosenLain] = useState(false);
     const [tanggal, setTanggal] = useState(new Object);
     const [toast,setToast] = useState(false);
+    const [selectedDate, setSelectedDate] = useState("");
 
     const openModal = () => {
         if(selectedJadwalSaya==""||selectedJadwalDosenLain==""){
@@ -74,6 +75,9 @@ export default function MainPengajuanTukar({props}){
                 }
             }
 
+            if(tgl.length!=0){
+                setSelectedDate(tgl[0].date.toISOString());
+            }
             setTanggal(tgl);
             setSemester(semester);
             setJadwalSaya(arrSaya);
@@ -96,7 +100,7 @@ export default function MainPengajuanTukar({props}){
             openModalPendingDosenLain();
         }
         else{
-            const response = await insertPertukaran(selectedJadwalSaya,selectedJadwalDosenLain,session.semester);
+            const response = await insertPertukaran(selectedJadwalSaya,selectedJadwalDosenLain,selectedSemester);
             if(response){
                 openToast();
                 closeModal();
@@ -128,6 +132,9 @@ export default function MainPengajuanTukar({props}){
             }
         }
         
+        if(tgl.length!=0){
+            setSelectedDate(tgl[0].date.toISOString());
+        }
         setTanggal(tgl);
         setSelectedSemester(e.target.value);
         setJadwalSaya(arrSaya);
@@ -153,7 +160,10 @@ export default function MainPengajuanTukar({props}){
             }
         }
         
-        setTanggal(tanggal);
+        if(tgl.length!=0){
+            setSelectedDate(tgl[0].date.toISOString());
+        }
+        setTanggal(tgl);
         setSelectedTipe(e.target.value);
         setJadwalSaya(arrSaya);
         setJadwalDosenLain(arrDosenLain);
@@ -260,7 +270,7 @@ export default function MainPengajuanTukar({props}){
                             <ItemJadwalSaya selectedJadwalSaya={selectedJadwalSaya} setSelectedJadwalSaya={setSelectedJadwalSaya} jadwalsaya={jadwalSaya}/>
                         </Tab>
                         <Tab eventKey="jadwaldosenlain" title="Jadwal Dosen Lain">
-                            <ItemJadwalDosenLain selectedJadwalDosenLain={selectedJadwalDosenLain} tanggal={tanggal} setSelectedJadwalDosenLain={setSelectedJadwalDosenLain} jadwaldosenlain={jadwalDosenLain}/>
+                            <ItemJadwalDosenLain selectedJadwalDosenLain={selectedJadwalDosenLain} tanggal={tanggal} selectedDate={selectedDate} setSelectedDate={setSelectedDate} setSelectedJadwalDosenLain={setSelectedJadwalDosenLain} jadwaldosenlain={jadwalDosenLain}/>
                         </Tab>
                     </Tabs>
                 </div>

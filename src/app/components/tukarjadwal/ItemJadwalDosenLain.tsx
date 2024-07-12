@@ -5,8 +5,6 @@ import { nullable } from "zod";
 
 const ItemJadwalDosenLain = (props) => {
     const [search, setSearch] = useState("");
-    const [selectedDate, setSelectedDate] = useState(props.tanggal[0].date.toISOString());
-
 
     const setSelected = (e) => {
         props.setSelectedJadwalDosenLain(e.target.parentElement.id);
@@ -17,7 +15,7 @@ const ItemJadwalDosenLain = (props) => {
     }
 
     const handleChangeDate = (e) => {
-        setSelectedDate(e.target.value);
+        props.setSelectedDate(e.target.value);
     }
 
     const changeSearch = (e) => {
@@ -32,7 +30,7 @@ const ItemJadwalDosenLain = (props) => {
                 <input className="form-control w-25 mb-1" placeholder="Search" onChange={changeSearch} style={{border:"2px solid black"}}/>
                 <FormSelect onChange={handleChangeDate} style={{border:"2px solid black"}} className="mx-1 mb-1 w-25">
                     {props.tanggal.map((t)=>(
-                        t.date.toISOString()==selectedDate ?
+                        t.date.toISOString()==props.selectedDate ?
                         <option value={t.date.toISOString()} selected>{t.date.toDateString().split(" ")[0]+", "+t.date.toDateString().split(" ")[2]+" "+t.date.toDateString().split(" ")[1]+" "+t.date.toDateString().split(" ")[3]}</option>
                         :
                         <option value={t.date.toISOString()}>{t.date.toDateString().split(" ")[0]+", "+t.date.toDateString().split(" ")[2]+" "+t.date.toDateString().split(" ")[1]+" "+t.date.toDateString().split(" ")[3]}</option>
@@ -65,7 +63,7 @@ const ItemJadwalDosenLain = (props) => {
                     </CardBody>
                 </Card>
                 {props.jadwaldosenlain.map((jadwal)=>(
-                    jadwal.ujian.date.toISOString()==selectedDate?
+                    jadwal.ujian.date.toISOString()==props.selectedDate?
                         search=="" ?
                             props.selectedJadwalDosenLain == jadwal.id?
                             <Card className="my-1" onClick={setSelected} id={jadwal.id} style={{borderRadius:"10px",border:"2px solid black", backgroundColor:"#83F28F", cursor:"pointer"}}>
